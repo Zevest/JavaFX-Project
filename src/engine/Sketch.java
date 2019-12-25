@@ -2,80 +2,88 @@ package engine;
 
 import java.util.ArrayList;
 
+import constant.COLOR_MODE;
+import constant.DRAW_MODE;
+import constant.MOUSE_BUTTON;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
+import util.FileManager;
 
 
 
-enum DRAW_MODE{
-	CORNER,
-	CENTER,	
-	LEFT,
-	RIGHT
-}
 
-enum COLOR_MODE{
-	RGB,
-	HSB,
-}
 
 public class Sketch {
 
-	protected ArrayList<Double> verticesX;
-	protected ArrayList<Double> verticesY;
-	protected Color fillColor = Color.WHITE;
-	protected Color strokeColor = Color.BLACK;
-	protected boolean isFilled = true;
-	protected boolean isStroked = true;
-	protected int strokeWeightVal = 1;
-	protected String fontName;
+	ArrayList<Double> verticesX;
+	ArrayList<Double> verticesY;
+	Color fillColor = Color.WHITE;
+	Color strokeColor = Color.BLACK;
+	boolean isFilled = true;
+	boolean isStroked = true;
+	short strokeWeightVal = 1;
+	String fontName;
+	double xOffset = 0;
+	double yOffset = 0;
+	public double PI = Math.PI;
+	public double HALF_PI = PI/2.0;
+	public double TWO_PI = 2*PI;
+	public short width = 200, height = 200; 
 	
-	public int width = 200, height = 200; 
+	DRAW_MODE ellipseModeVal = DRAW_MODE.CENTER;
+	DRAW_MODE rectModeVal = DRAW_MODE.CORNER;
+	boolean makingShape = false;
 	
-	protected DRAW_MODE ellipseModeVal;
-	protected DRAW_MODE rectModeVal;
-	protected boolean makingShape = false;
+	int textSizeVal = 15;
+	DRAW_MODE textAligneVal = DRAW_MODE.LEFT;
+	COLOR_MODE colorModeVal = COLOR_MODE.RGB;
 	
-	protected int textSizeVal = 15;
-	protected DRAW_MODE textAligneVal = DRAW_MODE.LEFT;
-	protected COLOR_MODE colorModeVal = COLOR_MODE.RGB;
+	DRAW_MODE imageModeVal = DRAW_MODE.CENTER;
+	
+	private ArrayList<PenStack> infoStack = new ArrayList<PenStack>();
 	
 	public float frameRate;
 	
 	private Canvas can; 
-	protected GraphicsContext pen;
+	GraphicsContext pen;
+	private float targetFrameRate = 60f;
+	public long frameCount;
+	boolean isLoop = true;
 	
+	//Mouse
+	public double mouseX = 0;
+	public double mouseY = 0;
+	public MOUSE_BUTTON mouseButton = MOUSE_BUTTON.NONE;
+	public String key;
+	public KeyCode keyCode;
+	public final String CODED = "CODED";
+	private final int useless = FileManager.init();
 	
-	Sketch(){}
+	public Sketch(){}
 	
-	public void setup() {
-		size(1000, 1000);
-		
-	}
+	public void setup() {}
 	
-	public void draw() {
-		ellipseMode(DRAW_MODE.CENTER);
-		stroke(Color.GRAY);
-		strokeWeight(10);
-		line(width/2, height/2, 3*width/4, 3*height/4);
-		fill(200, 20, 30);
-		rect(width/2, height/2, 500,500);
-		ellipseMode(DRAW_MODE.CORNER);
-		fill(0, 20, 180);
-		noStroke();
-		rect(width/2, height/2, 500,500);
-		strokeWeight(2);
-		stroke(0);
-		line(width/2, height/2, 3*width/4, 3*height/4);
-	}
+	public void draw() {}
+	
+	public void mousePressed() {}
+	
+	public void mouseReleased() {}
+	
+	public void keyPressed() {}
+	
+	public void keyReleased() {}
+	
+	public void mouseDragged() {}
 		
 	public final void size(int w, int h) {
-		width = w;
+		width = (short)w;
 		can.setWidth(width);
-		height = h;
+		height = (short)h;
 		can.setHeight(height);
 	}
 	
@@ -83,17 +91,59 @@ public class Sketch {
 		can = canvas;
 		pen = can.getGraphicsContext2D();
 	}
-	
+
+
+
+	//utility Function
+	public final void println(Object o, Object ... other) {
+		String buffer = o.toString();
+		for(Object e: other) {
+			if(e != null)
+				buffer += " " + e.toString();
+			else
+				buffer += " null";
+		}
+		System.out.println(buffer);
+	}
+
+	public final void print(Object o, Object ... other) {
+		String buffer = o.toString();
+		for(Object e: other) {
+			buffer += " " + e.toString();
+		}
+		System.out.print(buffer);
+	}
+
+	public final void frameRate(float rate) {
+		targetFrameRate = rate;
+	}
+
+	protected final float getTargetFrameRate() {
+		return targetFrameRate;
+	}
+
+	public final void loop() {
+		isLoop = true;
+	}
+
+	public final void noLoop() {
+		isLoop = false;
+	}
+
+
+
+
+	/// Draw function
 	public final void clear() {
 		pen.clearRect(0, 0, width, height);
 	}
-	
+
 	public final void background(Color color) {
 		pen.setFill(color);
 		pen.fillRect(0, 0, width, height);
 		pen.setFill(fillColor);
 	}
-	
+
 	public final void background(int val) {
 		switch(colorModeVal) {
 			case RGB:
@@ -107,7 +157,7 @@ public class Sketch {
 		pen.fillRect(0, 0, width, height);
 		pen.setFill(fillColor);
 	}
-	
+
 	public final void background(int r, int g, int b) {
 		switch(colorModeVal) {
 			case RGB:
@@ -123,7 +173,7 @@ public class Sketch {
 		pen.fillRect(0, 0, width, height);
 		pen.setFill(fillColor);
 	}
-	
+
 	public final void background(int r, int g, int b, int a) {
 		double red = Math.max(0, Math.min(1.0, r/255.0));
 		double green = Math.max(0, Math.min(1.0, g/255.0));
@@ -140,18 +190,18 @@ public class Sketch {
 		pen.fillRect(0, 0, width, height);
 		pen.setFill(fillColor);
 	}
-	
+
 	public final void background(String webColor) {
 		pen.setFill(Color.web(webColor));
 		pen.fillRect(0, 0, width, height);
 		pen.setFill(fillColor);
 	}
-	
+
 	public final void fill(Color color) {
 		pen.setFill(color);
 		fillColor = (Color) pen.getFill();
 	}
-	
+
 	public final void fill(int val) {
 		isFilled = true;
 		switch(colorModeVal) {
@@ -166,7 +216,7 @@ public class Sketch {
 		fillColor = (Color) pen.getFill();
 		
 	}
-	
+
 	public final void fill(int r, int g, int b) {
 		isFilled = true;
 		switch(colorModeVal) {
@@ -183,7 +233,7 @@ public class Sketch {
 		fillColor = (Color) pen.getFill();
 		
 	}
-	
+
 	public final void fill(int r, int g, int b, int a) {
 		isFilled = true;
 		double red = Math.max(0, Math.min(1.0, r/255.0));
@@ -200,25 +250,25 @@ public class Sketch {
 		}
 		fillColor = (Color) pen.getFill();
 	}
-	
+
 	public final void fill(String webColor) {
 		isFilled = true;
 		pen.setFill(Color.web(webColor));
 		fillColor = (Color) pen.getFill();
 	}
-	
+
 	public final void noFill() {
 		isFilled = false;
 		pen.setFill(null);
 		fillColor = (Color) pen.getFill();
 	}
-	
+
 	public final void stroke(Color color) {
 		isStroked = true;
 		pen.setStroke(color);
 		strokeColor = (Color) pen.getStroke();
 	}
-	
+
 	public final void stroke(int val) {
 		isStroked = true;
 		switch(colorModeVal) {
@@ -232,7 +282,7 @@ public class Sketch {
 		}
 		strokeColor = (Color) pen.getStroke();
 	}
-	
+
 	public final void stroke(int r, int g, int b) {
 		isStroked = true;
 		switch(colorModeVal) {
@@ -248,7 +298,7 @@ public class Sketch {
 		}
 		strokeColor = (Color) pen.getStroke();
 	}
-	
+
 	public final void stroke(int r, int g, int b, int a) {
 		isStroked = true;
 		double red = Math.max(0, Math.min(1.0, r/255.0));
@@ -265,7 +315,7 @@ public class Sketch {
 		}
 		strokeColor = (Color) pen.getStroke();
 	}
-	
+
 	public final void stroke(String webColor) {
 		isStroked = true;
 		pen.setStroke(Color.web(webColor));
@@ -294,8 +344,12 @@ public class Sketch {
 		rectModeVal = mode;
 	}
 	
+	public final void imageMode(DRAW_MODE mode) {
+		imageModeVal = mode;
+	}
+	
 	public final void line(double x1, double y1, double x2, double y2) {
-		pen.strokeLine(x1, y1, x2, y2);
+		pen.strokeLine(x1 + xOffset, y1 + yOffset, x2 + xOffset, y2 + yOffset);
 	}
 	
 	public final void ellipse(double x, double y, double w, double h) {
@@ -341,7 +395,7 @@ public class Sketch {
 	}
 	
 	public final void rect(double x, double y, double w, double h) {
-		switch(ellipseModeVal) {
+		switch(rectModeVal) {
 		case CORNER:
 			if(isFilled)
 				pen.fillRect(x, y, w, h);
@@ -355,10 +409,10 @@ public class Sketch {
 				pen.strokeRect(x-w/2, y-h/2, w, h);
 			break;
 		default:
-			System.err.println("Error: Undefined ellipse Mode " + ellipseModeVal);
+			System.err.println("Error: Undefined rectangle Mode " + rectModeVal);
 			System.exit(-1);
 			
-	}
+		}
 	}
 	
 	public final void beginShape() {
@@ -386,12 +440,46 @@ public class Sketch {
 		makingShape = false;
 	}
 	
+	public final void pushMatrix() {
+		pen.save();
+		infoStack.add(new PenStack(this));
+		verticesX = new ArrayList<Double>();
+		verticesY = new ArrayList<Double>();
+	}
+	
+	public void popMatrix() {
+		PenStack s = infoStack.get(infoStack.size()-1);
+		pen.restore();
+		infoStack.remove(infoStack.size()-1);
+		verticesX = s.verticesX;
+		verticesY = s.verticesY;
+		xOffset = s.xOffset;
+		yOffset = s.yOffset;
+		fillColor = s.fillColor;
+		strokeColor = s.strokeColor;
+		isFilled = s.isFilled;
+		isStroked = s.isStroked;
+		strokeWeightVal = s.strokeWeightVal;
+		fontName = s.fontName;
+		ellipseModeVal = s.ellipseModeVal;
+		rectModeVal = s.rectModeVal;
+		makingShape = s.makingShape;
+		textSizeVal = s.textSizeVal;
+		colorModeVal = s.colorModeVal;
+	}
+	
 	public final void textFont(String name) {
 		fontName = name; 
 		pen.setFont(new Font(fontName, textSizeVal));
 	}
 	
-	public final void text(String text, int x, int y) {
+	public final void rotate(double angle) {
+		//pen.rotate(angle);
+		pen.rotate(-angle *(180.0/Math.PI));
+	}
+	
+	
+	public final void text(String text, double x, double y) {
 		if(isFilled)
 			pen.fillText(text, x, y);
 		if(isStroked)
@@ -420,5 +508,61 @@ public class Sketch {
 		textSizeVal = size; 
 		pen.setFont(new Font(fontName, textSizeVal));
 	}
+	
+	
+	public final void translate(double x, double y) {
+		pen.translate(-xOffset, -yOffset);
+		xOffset = x;
+		yOffset = y;
+		pen.translate(xOffset, yOffset);
+	}
+	
+	
+	public final Image loadImage(String Name) {
+		String url= FileManager.getFileUrl(Name);
+		if(url != null)
+			return new Image(url);
+		System.err.println("Error: image not found.");
+		return null;
+	}
+	
+	public final void image(Image img, double x, double y) {
+		switch(imageModeVal) {
+			case CENTER:
+				pen.drawImage(img, x - img.getWidth()/2, y - img.getHeight()/2);
+				break;
+			case CORNER:
+				pen.drawImage(img, x, y);
+				break;
+			default:
+				System.err.println("Invalid Image Draw Mode : " + imageModeVal);
+		}
+	}
+	
+	public final void image(Image img, double x, double y, double w, double h) {
+		switch(imageModeVal) {
+			case CENTER:
+				pen.drawImage(img, x - w/2, y - h/2, w, h);
+				break;
+			case CORNER:
+				pen.drawImage(img, x, y, w, h);
+				break;
+			default:
+				System.err.println("Invalid Image Draw Mode : " + imageModeVal);
+		}
+	}
+	
+	public final void image(Image img, double dx, double dy, double dw, double dh, double sx, double sy, double sw, double sh) {
 
+		switch(imageModeVal) {
+			case CENTER:
+				pen.drawImage(img, sx, sy, sw, sh, dx - dw/2, dy - dh/2, dw, dh);
+				break;
+			case CORNER:
+				pen.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+				break;
+			default:
+				System.err.println("Invalid Image Draw Mode : " + imageModeVal);
+		}
+	} 
 }

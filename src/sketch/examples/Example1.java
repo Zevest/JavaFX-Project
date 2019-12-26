@@ -1,13 +1,13 @@
-package sketch.example1;
+package sketch.examples;
 
 import constant.DRAW_MODE;
 import engine.Sketch;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
-public class UserSketch extends Sketch {
+public class Example1 extends Sketch {
 	Image img;
-	public UserSketch() {}
+	public Example1() {}
 	Grid grid;
 	Turtle t;
 	boolean run;
@@ -144,10 +144,11 @@ public class UserSketch extends Sketch {
 		    pushMatrix();
 		    translate(x * grid.lw+0.5*size, y* grid.lh+0.5*size);
 		    rotate(-HALF_PI*(orient%4));
-		    fill(0,200,40);
+		    //println(color(0, 200, 40));
+		    fill(color(0,200,40));
 		    //triangle(-.5*size,-.5*size,-.5*size,.5*size,.5*size,0);
 		    rectMode(DRAW_MODE.CENTER);
-		    rect(0, 0, size , size*0.5);
+		    triangle(-0.5*size, -0.5*size, -0.5*size , 0.5*size, 0.5*size, 0);
 		    popMatrix();
 		  }
 		  

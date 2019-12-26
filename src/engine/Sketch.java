@@ -13,6 +13,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import util.FileManager;
+import util.Util;
+import util.color;
 
 
 
@@ -34,6 +36,7 @@ public class Sketch {
 	public double HALF_PI = PI/2.0;
 	public double TWO_PI = 2*PI;
 	public short width = 200, height = 200; 
+	boolean isFullScreen  = false;
 	
 	DRAW_MODE ellipseModeVal = DRAW_MODE.CENTER;
 	DRAW_MODE rectModeVal = DRAW_MODE.CORNER;
@@ -56,8 +59,8 @@ public class Sketch {
 	boolean isLoop = true;
 	
 	//Mouse
-	public double mouseX = 0;
-	public double mouseY = 0;
+	public float mouseX = 0;
+	public float mouseY = 0;
 	public MOUSE_BUTTON mouseButton = MOUSE_BUTTON.NONE;
 	public String key;
 	public KeyCode keyCode;
@@ -87,14 +90,88 @@ public class Sketch {
 		can.setHeight(height);
 	}
 	
+	public final void fullScreen() {
+		isFullScreen = true;
+		Core.setFullScreen();
+		width = (short) Core.width;
+		height = (short) Core.height;
+		can.setWidth(width);
+		can.setHeight(height);
+		
+	}
+	
 	protected final void setContext(Canvas canvas) {
 		can = canvas;
 		pen = can.getGraphicsContext2D();
 	}
 
 
-
+	
 	//utility Function
+	
+	public final float min(double a, double ...other) {
+		return (float) Util.min(a, other);
+	}
+	
+	public final float max(double a, double ...other) {
+		return (float) Util.max(a, other);
+	}
+	
+	public final float abs(double a) {
+		return (float) Util.abs(a);
+	}
+	
+	public final float log(double a) {
+		return (float) Math.log(a);
+	}
+	
+	public final int _int(float o) {
+		return (int) o;
+	}
+	public final float _float(int o) {
+		return (float) o;
+	}
+	public final String _String(Object o) {
+		return o.toString();
+	}
+	
+	public final color color(int c) {
+		return color.__color(c);
+		
+	}
+	
+	public final color color(int c,int a) {
+		return color.__color(c, a);
+	}
+	
+	public final color color(int r, int g, int b) {
+		switch(colorModeVal) {
+		case RGB:
+			return color.__color(r, g, b);
+		case HSB:
+			double red = Math.max(0, Math.min(1.0, r/255.0));
+			double green = Math.max(0, Math.min(1.0, g/255.0));
+			double blue = Math.max(0, Math.min(1.0, b/255.0));
+			return color.__color(red, green, blue, 1.0);
+	}
+		
+		return (color.__color(r, g, b));
+	}
+	
+	public final color color(int r, int g, int b, int a) {
+		double red = Math.max(0, Math.min(1.0, r/255.0));
+		double green = Math.max(0, Math.min(1.0, g/255.0));
+		double blue = Math.max(0, Math.min(1.0, b/255.0));
+		double alpha = Math.max(0, Math.min(1.0, a/255.0));
+		switch(colorModeVal) {
+			case RGB:
+				return color.__color(red, green, blue, alpha);
+			case HSB:
+				return color.__color(red, green, blue, alpha);
+		}
+		return null;
+	}
+	
 	public final void println(Object o, Object ... other) {
 		String buffer = o.toString();
 		for(Object e: other) {
@@ -113,6 +190,15 @@ public class Sketch {
 		}
 		System.out.print(buffer);
 	}
+	
+	public final float random(double max) {
+		return (float)(Math.random() * max);
+	}
+	
+	
+	public final float random(double min, double max) {
+		return (float)(min + Math.random() * (max - min));
+	}
 
 	public final void frameRate(float rate) {
 		targetFrameRate = rate;
@@ -130,27 +216,34 @@ public class Sketch {
 		isLoop = false;
 	}
 
-
-
+	public final float dist(double x1, double y1, double x2, double y2) {
+		return (float) Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2 - y1, 2));
+	}
+	
+	public final float dist(double x1, double y1, double z1, double x2, double y2, double z2) {
+		return (float) Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2 - y1, 2) + Math.pow(z2 - z1, 2));
+	}
 
 	/// Draw function
 	public final void clear() {
 		pen.clearRect(0, 0, width, height);
 	}
 
-	public final void background(Color color) {
-		pen.setFill(color);
+	public final void background(color color) {
+		print(color.col);
+		pen.setFill(color.col);
 		pen.fillRect(0, 0, width, height);
 		pen.setFill(fillColor);
 	}
 
-	public final void background(int val) {
+	public final void background(double val) {
+		double color = Math.max(0, Math.min(1.0, val/255.0));
 		switch(colorModeVal) {
 			case RGB:
-				pen.setFill(Color.rgb(val, val, val));
+				
+				pen.setFill(Color.color(color, color, color));
 				break;
 			case HSB:
-				double color = Math.max(0, Math.min(1.0, val/255.0));
 				pen.setFill(Color.hsb(color, color, color));
 				break;
 		}
@@ -197,8 +290,8 @@ public class Sketch {
 		pen.setFill(fillColor);
 	}
 
-	public final void fill(Color color) {
-		pen.setFill(color);
+	public final void fill(color color) {
+		pen.setFill(color.col);
 		fillColor = (Color) pen.getFill();
 	}
 
@@ -263,9 +356,9 @@ public class Sketch {
 		fillColor = (Color) pen.getFill();
 	}
 
-	public final void stroke(Color color) {
+	public final void stroke(color color) {
 		isStroked = true;
-		pen.setStroke(color);
+		pen.setStroke(color.col);
 		strokeColor = (Color) pen.getStroke();
 	}
 
@@ -415,6 +508,16 @@ public class Sketch {
 		}
 	}
 	
+	public final void triangle(double x1, double y1, double x2, double y2, double x3, double y3) {
+		double[] posX = {x1, x2, x3};
+		double[] posY = {y1, y2, y3};
+		if(isFilled) {
+			pen.fillPolygon(posX, posY, 3);
+		}if(isStroked) {
+			pen.strokePolygon(posX, posY, 3);
+		}
+	}
+	
 	public final void beginShape() {
 		makingShape = true;
 		verticesX = new ArrayList<Double>();
@@ -443,8 +546,6 @@ public class Sketch {
 	public final void pushMatrix() {
 		pen.save();
 		infoStack.add(new PenStack(this));
-		verticesX = new ArrayList<Double>();
-		verticesY = new ArrayList<Double>();
 	}
 	
 	public void popMatrix() {
@@ -475,7 +576,7 @@ public class Sketch {
 	
 	public final void rotate(double angle) {
 		//pen.rotate(angle);
-		pen.rotate(-angle *(180.0/Math.PI));
+		pen.rotate(angle *(180.0/Math.PI));
 	}
 	
 	

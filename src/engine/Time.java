@@ -2,7 +2,7 @@ package engine;
 
 
 import javafx.animation.AnimationTimer;
-import util.Math;
+import util.Util;
 public class Time extends AnimationTimer{
 
 	Core main;

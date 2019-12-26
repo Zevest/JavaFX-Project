@@ -8,22 +8,23 @@ import constant.MOUSE_BUTTON;
 
 import javafx.application.Application;
 import javafx.event.EventHandler;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 //import javafx.event.ActionEvent;
 //import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-//import javafx.scene.control.Button;
-import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.stage.Screen;
 //import javafx.scene.paint.Color;
 //import javafx.scene.text.Font;
 //import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import sketch.example1.UserSketch;
+import sketch.examples.Example1;
+import sketch.examples.Example2;
 
 
 public class Core extends Application {
@@ -34,7 +35,7 @@ public class Core extends Application {
 	private float targetFrameRate = 60f;
 	private Canvas canvas;
 	protected GraphicsContext context;
-	private Stage mainStage;
+	static private Stage mainStage;
 	private Group root;
 	private Scene scene;
 	protected Sketch sketch; 
@@ -57,6 +58,12 @@ public class Core extends Application {
     	
     }
 
+    static void setFullScreen() {
+    	Rectangle2D bound = Screen.getPrimary().getVisualBounds();
+    	width = (int)bound.getWidth();
+    	height = (int)bound.getHeight();
+    	mainStage.setFullScreen(true);
+    }
     
     @Override
     public void start(Stage primaryStage) {
@@ -69,7 +76,7 @@ public class Core extends Application {
     	
     	canvas = new Canvas(200, 200);
     	scene.setFill(Color.LIGHTGRAY);
-    	sketch = new UserSketch();
+    	sketch = new Example2();
     	sketch.setContext(canvas);
     	sketch.background(150);
     	sketch.fill(255);
@@ -119,8 +126,8 @@ public class Core extends Application {
     	scene.addEventHandler(MouseEvent.MOUSE_MOVED, new EventHandler<MouseEvent>( ) {
     		@Override
     		public void handle(MouseEvent mouseEvent) {
-    			sketch.mouseX = mouseEvent.getX();
-    			sketch.mouseY = mouseEvent.getY();
+    			sketch.mouseX =(float) mouseEvent.getX();
+    			sketch.mouseY =(float) mouseEvent.getY();
     		}
     	});
     	
@@ -128,8 +135,8 @@ public class Core extends Application {
     	    @Override
     	    public void handle(MouseEvent mouseEvent) {
     	        
-    	    	sketch.mouseX = mouseEvent.getX();
-    			sketch.mouseY = mouseEvent.getY();
+    	    	sketch.mouseX = (float)mouseEvent.getX();
+    			sketch.mouseY = (float)mouseEvent.getY();
     	    	sketch.mouseDragged();
     	    }
     	});
@@ -166,8 +173,8 @@ public class Core extends Application {
     	
     	
     	////////////
-    	canvas.setWidth(sketch.width);
-    	canvas.setHeight(sketch.height);
+    	//canvas.setWidth(sketch.width);
+    	//canvas.setHeight(sketch.height);
     	root.getChildren().add(canvas);
     	
     	sketch.setContext(canvas);

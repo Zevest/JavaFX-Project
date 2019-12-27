@@ -19,4 +19,11 @@ public class Util {
 		return (a > 0 ? a : -a);
 	}
 	
+	public static double map(double value,double start1,double end1,double start2,double end2) {
+		return (value/(end1-start1)*(end2-start2))+start2;
+	}
+	
+	public static double lerp(double start, double end, double amt) {
+		return (end-start) * amt;
+	}
 }

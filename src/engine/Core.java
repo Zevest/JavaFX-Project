@@ -1,5 +1,6 @@
 package engine;
 
+import constant.COLOR_MODE;
 //import util.Math;
 import constant.MOUSE_BUTTON;
 
@@ -7,6 +8,7 @@ import constant.MOUSE_BUTTON;
 //import engine.Sketch;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
@@ -23,7 +25,6 @@ import javafx.stage.Screen;
 //import javafx.scene.text.Font;
 //import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import sketch.examples.Example1;
 import sketch.examples.Example2;
 
 
@@ -47,14 +48,19 @@ public class Core extends Application {
     }
     
     
-    protected void update(){
+    protected void update(double elapsedTime){
     	setTargetFrameRate(sketch.getTargetFrameRate());
+    	sketch.deltaTime = (float)elapsedTime/1000.0f;
+    	sketch.deltaTimeMillis = (float)elapsedTime;
     	if(sketch.isLoop) {
     		sketch.draw();
     		sketch.translate(0, 0);
     	}
     	sketch.frameRate = (float) frameRate;
     	++sketch.frameCount;
+    	if(sketch.finished == true) {
+    		Platform.exit();
+    	}
     	
     }
 
@@ -73,13 +79,15 @@ public class Core extends Application {
     	scene = new Scene(root);
     	
     	mainStage.setScene(scene);
-    	
+    	mainStage.setFullScreenExitHint("");
     	canvas = new Canvas(200, 200);
     	scene.setFill(Color.LIGHTGRAY);
     	sketch = new Example2();
     	sketch.setContext(canvas);
-    	sketch.background(150);
+    	
     	sketch.fill(255);
+    	sketch.stroke(0);
+    	sketch.colorMode(COLOR_MODE.RGB, 255, 255, 255, 255);
     	sketch.setup();
     	
     	
@@ -149,6 +157,7 @@ public class Core extends Application {
 			@Override
 			public void handle(KeyEvent event) {
 				//get The keyPressed
+
 				String tmp = event.getText();
 				sketch.key = tmp.length() > 0 ? tmp : "CODED";
 				sketch.keyCode = event.getCode();

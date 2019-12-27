@@ -8,44 +8,21 @@ public class color{
 	float[] value;
 
 	color(){}
-    public static color __color(int c) {
-		color tmp = new color();
-		float[] v = {c, c, c, 255};
-		tmp.col = Color.grayRgb(c);
-		tmp.value = v;
-		return tmp;
-	}
-	
-    public static color __color(int c,int a) {
-		color tmp = new color();
-		float[] v = {c, c, c, a};
-		tmp.col = Color.grayRgb(c, a/255.0);
-		tmp.value = v;
-		return tmp;
-	}
-	
-    public static color __color(int r, int g, int b) {
-		color tmp = new color();
-		float[] v = {r, g, b, 255};
-		tmp.col = Color.rgb(r, g, b);
-		tmp.value = v;
-		return tmp;
 
-	}
 	
-    public static color __color(double r, double g, double b, double a) {
+    public static color __color(boolean isHSB, double r, double g, double b, double a, double maxR,double maxG,double maxB, double maxA) {
 
-		double red = Math.max(0, Math.min(1.0, r/255.0));
-		double green = Math.max(0, Math.min(1.0, g/255.0));
-		double blue = Math.max(0, Math.min(1.0, b/255.0));
 		color tmp = new color();
 		float[] v = {
-				(float) (red*255),
-				(float) (green*255),
-				(float) (blue*255),
-				(float) a
+				(float) (r*maxR),
+				(float) (g*maxG),
+				(float) (b*maxB),
+				(float) (a*maxA)
 			};
-		tmp.col = Color.color(red, green, blue, a/255.0);
+		if(isHSB)
+			tmp.col = Color.hsb(r, g, b,a);
+		else
+			tmp.col = Color.color(r, g, b, a);
 		tmp.value = v;
 		return tmp;
 	}

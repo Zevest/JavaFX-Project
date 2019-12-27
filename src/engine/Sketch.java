@@ -32,11 +32,17 @@ public class Sketch {
 	String fontName;
 	double xOffset = 0;
 	double yOffset = 0;
+	double xScale = 1;
+	double yScale = 1;
+	
+	
 	public double PI = Math.PI;
 	public double HALF_PI = PI/2.0;
 	public double TWO_PI = 2*PI;
-	public short width = 200, height = 200; 
+	public short width = 200, height = 200;
+	
 	boolean isFullScreen  = false;
+	boolean finished = false;
 	
 	DRAW_MODE ellipseModeVal = DRAW_MODE.CENTER;
 	DRAW_MODE rectModeVal = DRAW_MODE.CORNER;
@@ -45,12 +51,14 @@ public class Sketch {
 	int textSizeVal = 15;
 	DRAW_MODE textAligneVal = DRAW_MODE.LEFT;
 	COLOR_MODE colorModeVal = COLOR_MODE.RGB;
-	
+	private double maxR=255, maxG=255, maxB=255, maxA=255;
 	DRAW_MODE imageModeVal = DRAW_MODE.CENTER;
 	
 	private ArrayList<PenStack> infoStack = new ArrayList<PenStack>();
 	
 	public float frameRate;
+	public float deltaTime;
+	public float deltaTimeMillis;
 	
 	private Canvas can; 
 	GraphicsContext pen;
@@ -72,7 +80,7 @@ public class Sketch {
 	public void setup() {}
 	
 	public void draw() {}
-	
+
 	public void mousePressed() {}
 	
 	public void mouseReleased() {}
@@ -88,6 +96,10 @@ public class Sketch {
 		can.setWidth(width);
 		height = (short)h;
 		can.setHeight(height);
+	}
+	
+	public final void exit() {
+		finished = true;
 	}
 	
 	public final void fullScreen() {
@@ -125,6 +137,22 @@ public class Sketch {
 		return (float) Math.log(a);
 	}
 	
+	public final float floor(double a) {
+		return (float) Math.floor(a);
+	}
+	
+	public final float ceil(double a) {
+		return (float) Math.ceil(a);
+	}
+	
+	public final float map(double value,double start1,double end1,double start2,double end2) {
+		return (float) Util.map(value, start1, end1, start2, end2);
+	}
+	
+	public final float lerp(double start, double end, double amt) {
+		return (float) Util.lerp(start, end, amt);
+	}
+	
 	public final int _int(float o) {
 		return (int) o;
 	}
@@ -135,42 +163,64 @@ public class Sketch {
 		return o.toString();
 	}
 	
-	public final color color(int c) {
-		return color.__color(c);
-		
-	}
 	
-	public final color color(int c,int a) {
-		return color.__color(c, a);
-	}
 	
-	public final color color(int r, int g, int b) {
-		switch(colorModeVal) {
-		case RGB:
-			return color.__color(r, g, b);
-		case HSB:
-			double red = Math.max(0, Math.min(1.0, r/255.0));
-			double green = Math.max(0, Math.min(1.0, g/255.0));
-			double blue = Math.max(0, Math.min(1.0, b/255.0));
-			return color.__color(red, green, blue, 1.0);
-	}
-		
-		return (color.__color(r, g, b));
-	}
-	
-	public final color color(int r, int g, int b, int a) {
-		double red = Math.max(0, Math.min(1.0, r/255.0));
-		double green = Math.max(0, Math.min(1.0, g/255.0));
-		double blue = Math.max(0, Math.min(1.0, b/255.0));
-		double alpha = Math.max(0, Math.min(1.0, a/255.0));
+	public final color color(double c) {
+		double nColor = Math.max(0, Math.min(1.0, c/maxR));
 		switch(colorModeVal) {
 			case RGB:
-				return color.__color(red, green, blue, alpha);
-			case HSB:
-				return color.__color(red, green, blue, alpha);
+				return color.__color(false, nColor, nColor, nColor, 1.0, maxR, maxR, maxR, maxA);
+			case HSB: 
+				return color.__color(true, nColor, nColor, nColor, 1.0, maxR, maxR, maxR, maxA);
+			default:
+				return null;
 		}
-		return null;
+		
 	}
+	
+	public final color color(double c,double a) {
+		double nColor = Math.max(0, Math.min(1.0, c/maxR));
+		double alpha = Math.max(0, Math.min(1.0, a/maxA));
+		switch(colorModeVal) {
+			case RGB:
+				return color.__color(false, nColor, nColor, nColor, alpha, maxR, maxR, maxR, maxA);
+			case HSB: 
+				return color.__color(true, nColor, nColor, nColor, alpha, maxR, maxR, maxR, maxA);
+			default:
+				return null;
+		}
+	}
+	
+	public final color color(double r, double g, double b) {
+		double red = Math.max(0, Math.min(1.0, r/maxR));
+		double green = Math.max(0, Math.min(1.0, g/maxG));
+		double blue = Math.max(0, Math.min(1.0, b/maxB));
+		switch(colorModeVal) {
+			case RGB:
+				return color.__color(false, red, green, blue, 1.0, maxR, maxG, maxB, maxA);
+			case HSB: 
+				return color.__color(true, red, green, blue, 1.0, maxR, maxG, maxB, maxA);
+			default:
+				return null;
+		}
+
+	}
+	
+	public final color color(double r, double g, double b, double a) {
+		double red = Math.max(0, Math.min(1.0, r/maxR));
+		double green = Math.max(0, Math.min(1.0, g/maxG));
+		double blue = Math.max(0, Math.min(1.0, b/maxB));
+		double alpha = Math.max(0, Math.min(1.0, a/maxA));
+		switch(colorModeVal) {
+			case RGB:
+				return color.__color(false, red, green, blue, alpha, maxR, maxG, maxB, maxA);
+			case HSB: 
+				return color.__color(true, red, green, blue, alpha, maxR, maxG, maxB, maxA);
+			default:
+				return null;
+		}
+	}
+	
 	
 	public final void println(Object o, Object ... other) {
 		String buffer = o.toString();
@@ -237,49 +287,25 @@ public class Sketch {
 	}
 
 	public final void background(double val) {
-		double color = Math.max(0, Math.min(1.0, val/255.0));
-		switch(colorModeVal) {
-			case RGB:
-				
-				pen.setFill(Color.color(color, color, color));
-				break;
-			case HSB:
-				pen.setFill(Color.hsb(color, color, color));
-				break;
-		}
+		pen.setFill(color(val).col);
 		pen.fillRect(0, 0, width, height);
 		pen.setFill(fillColor);
 	}
 
-	public final void background(int r, int g, int b) {
-		switch(colorModeVal) {
-			case RGB:
-				pen.setFill(Color.rgb(r, g, b));
-				break;
-			case HSB:
-				double red = Math.max(0, Math.min(1.0, r/255.0));
-				double green = Math.max(0, Math.min(1.0, g/255.0));
-				double blue = Math.max(0, Math.min(1.0, b/255.0));
-				pen.setFill(Color.color(red, green, blue));
-				break;
-		}
+	public final void background(double val, double alpha) {
+		pen.setFill(color(val, alpha).col);
+		pen.fillRect(0, 0, width, height);
+		pen.setFill(fillColor);
+	}
+	
+	public final void background(double r, double g, double b) {
+		pen.setFill(color(r,g,b).col);
 		pen.fillRect(0, 0, width, height);
 		pen.setFill(fillColor);
 	}
 
-	public final void background(int r, int g, int b, int a) {
-		double red = Math.max(0, Math.min(1.0, r/255.0));
-		double green = Math.max(0, Math.min(1.0, g/255.0));
-		double blue = Math.max(0, Math.min(1.0, b/255.0));
-		double alpha = Math.max(0, Math.min(1.0, a/255.0));
-		switch(colorModeVal) {
-			case RGB:
-				pen.setFill(Color.color(red, green, blue, alpha));
-				break;
-			case HSB:
-				pen.setFill(Color.hsb(red, green, blue, alpha));
-				break;
-		}
+	public final void background(double r, double g, double b, double a) {
+		pen.setFill(color(r,g,b,a).col);
 		pen.fillRect(0, 0, width, height);
 		pen.setFill(fillColor);
 	}
@@ -291,56 +317,34 @@ public class Sketch {
 	}
 
 	public final void fill(color color) {
+		isFilled = true;
 		pen.setFill(color.col);
 		fillColor = (Color) pen.getFill();
 	}
 
-	public final void fill(int val) {
+	public final void fill(double val) {
 		isFilled = true;
-		switch(colorModeVal) {
-			case RGB:
-				pen.setFill(Color.rgb(val, val, val));
-				break;
-			case HSB:
-				double color = Math.max(0, Math.min(1.0, val/255.0));
-				pen.setFill(Color.hsb(color, color, color));
-				break;
-		}
+		pen.setFill(color(val).col);
+		fillColor = (Color) pen.getFill();
+		
+	}
+	
+	public final void fill(double val, double a) {
+		isFilled = true;
+		pen.setFill(color(val, a).col);
+		fillColor = (Color) pen.getFill();
+	}
+
+	public final void fill(double r, double g, double b) {
+		isFilled = true;
+		pen.setFill(color(r,g,b).col);
 		fillColor = (Color) pen.getFill();
 		
 	}
 
-	public final void fill(int r, int g, int b) {
+	public final void fill(double r, double g, double b, double a) {
 		isFilled = true;
-		switch(colorModeVal) {
-			case RGB:
-				pen.setFill(Color.rgb(r, g, b));
-				break;
-			case HSB:
-				double red = Math.max(0, Math.min(1.0, r/255.0));
-				double green = Math.max(0, Math.min(1.0, g/255.0));
-				double blue = Math.max(0, Math.min(1.0, b/255.0));
-				pen.setFill(Color.color(red, green, blue));
-				break;
-		}
-		fillColor = (Color) pen.getFill();
-		
-	}
-
-	public final void fill(int r, int g, int b, int a) {
-		isFilled = true;
-		double red = Math.max(0, Math.min(1.0, r/255.0));
-		double green = Math.max(0, Math.min(1.0, g/255.0));
-		double blue = Math.max(0, Math.min(1.0, b/255.0));
-		double alpha = Math.max(0, Math.min(1.0, a/255.0));
-		switch(colorModeVal) {
-			case RGB:
-				pen.setFill(Color.color(red, green, blue, alpha));
-				break;
-			case HSB:
-				pen.setFill(Color.hsb(red, green, blue, alpha));
-				break;
-		}
+		pen.setFill(color(r,g,b,a).col);
 		fillColor = (Color) pen.getFill();
 	}
 
@@ -362,50 +366,26 @@ public class Sketch {
 		strokeColor = (Color) pen.getStroke();
 	}
 
-	public final void stroke(int val) {
+	public final void stroke(double val) {
 		isStroked = true;
-		switch(colorModeVal) {
-			case RGB:
-				pen.setStroke(Color.rgb(val, val, val));
-				break;
-			case HSB:
-				double color = Math.max(0, Math.min(1.0, val/255.0));
-				strokeColor = Color.hsb(color, color, color);
-				break;
-		}
+		pen.setStroke(color(val).col);
+		strokeColor = (Color) pen.getStroke();
+	}
+	public final void stroke(double val, double a) {
+		isStroked = true;
+		pen.setStroke(color(val, a).col);
 		strokeColor = (Color) pen.getStroke();
 	}
 
-	public final void stroke(int r, int g, int b) {
+	public final void stroke(double r, double g, double b) {
 		isStroked = true;
-		switch(colorModeVal) {
-			case RGB:
-				pen.setStroke(Color.rgb(r, g, b));
-				break;
-			case HSB:
-				double red = Math.max(0, Math.min(1.0, r/255.0));
-				double green = Math.max(0, Math.min(1.0, g/255.0));
-				double blue = Math.max(0, Math.min(1.0, b/255.0));
-				pen.setStroke(Color.color(red, green, blue));
-				break;
-		}
+		pen.setStroke(color(r,g,b).col);
 		strokeColor = (Color) pen.getStroke();
 	}
 
-	public final void stroke(int r, int g, int b, int a) {
+	public final void stroke(double r, double g, double b, double a) {
 		isStroked = true;
-		double red = Math.max(0, Math.min(1.0, r/255.0));
-		double green = Math.max(0, Math.min(1.0, g/255.0));
-		double blue = Math.max(0, Math.min(1.0, b/255.0));
-		double alpha = Math.max(0, Math.min(1.0, a/255.0));
-		switch(colorModeVal) {
-			case RGB:
-				pen.setStroke(Color.color(red, green, blue, alpha));
-				break;
-			case HSB:
-				pen.setStroke(Color.hsb(red, green, blue, alpha));
-				break;
-		}
+		pen.setStroke(color(r,g,b,a).col);
 		strokeColor = (Color) pen.getStroke();
 	}
 
@@ -426,6 +406,26 @@ public class Sketch {
 	}
 	
 	public final void colorMode(COLOR_MODE mode) {
+		colorModeVal = mode;
+	}
+	public final void colorMode(COLOR_MODE mode, double maxV) {
+		this.maxR = maxV;
+		this.maxG = maxV;
+		this.maxB = maxV;
+		this.maxA = maxV;
+		colorModeVal = mode;
+	}
+	public final void colorMode(COLOR_MODE mode, double maxR, double maxG, double maxB) {
+		this.maxR = maxR;
+		this.maxG = maxG;
+		this.maxB = maxB;
+		colorModeVal = mode;
+	}
+	public final void colorMode(COLOR_MODE mode, double maxR, double maxG, double maxB, double maxA) {
+		this.maxR = maxR;
+		this.maxG = maxG;
+		this.maxB = maxB;
+		this.maxA = maxA;
 		colorModeVal = mode;
 	}
 	
@@ -618,6 +618,19 @@ public class Sketch {
 		pen.translate(xOffset, yOffset);
 	}
 	
+	public final void scale(double x) {
+		pen.scale(1.0/xScale, 1.0/yScale);
+		xScale = x;
+		yScale = x;
+		pen.scale(x, x);
+	}
+	
+	public final void scale(double x, double y) {
+		pen.scale(1.0/xScale, 1.0/yScale);
+		xScale = x;
+		yScale = y;
+		pen.scale(x, y);
+	}
 	
 	public final Image loadImage(String Name) {
 		String url= FileManager.getFileUrl(Name);

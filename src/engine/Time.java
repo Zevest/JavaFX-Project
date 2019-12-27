@@ -20,9 +20,10 @@ public class Time extends AnimationTimer{
 		before = System.nanoTime();
 		if(deltaTime > (960.0f / (float) main.getTargetFrameRate())) {
 			main.frameRate = (1000.f / deltaTime);
-			deltaTime = 0;
 			
-			main.update();
+			
+			main.update(deltaTime);
+			deltaTime = 0;
 			++Core.frameCount;
 			
 		}

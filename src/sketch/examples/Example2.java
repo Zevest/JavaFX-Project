@@ -23,7 +23,7 @@ public class Example2 extends Sketch{
 	int population = 1000;
 	boolean Boxed = false;
 	int clickCount = 0;
-	String[] t = {"red", "blue", "green", "yellow", "white", "magenta", "cyan"};
+	String[] t = {"red", "blue", "green", "yellow", "white", "magenta", "cyan", "idk1", "idk2", "idk3", "idk4", "idk5", "idk6", "idk7", "idk8"};
 	PVector[] pos;
 
 	boolean followed = false;
@@ -36,11 +36,21 @@ public class Example2 extends Sketch{
 	  particles = new ArrayList<Particle>();
 	  color[] col = {color(255,0,0), color(0,0,255), color(0,255,0), color(255,255,0), color(255,255,255),
 	                color(255,0,255), color(0,255,255)};
+	  ArrayList<color> colNull = new ArrayList<color>();
+	  if(col.length < t.length) {
+		  for(int i = 0; i < t.length-col.length; i++) {
+			  colNull.add( color(random(100,255), random(100,255), random(100,255)));
+		  }
+	  }
 	  HashMap <String, HashMap> sete = createTable(t);
 	  for(int i = 0; i< population; i++){
-	    int R = _int(random(t.length)); 
+	    int R = _int(random(t.length));
 	    new Colored();
-	    particles.get(i).setColor(col[R]);
+	    if(R >= col.length) {
+	    	particles.get(i).setColor(colNull.get(R-col.length));
+	    }else {
+	    	particles.get(i).setColor(col[R]);
+	    }
 	    particles.get(i).setName(t[R]);
 	    particles.get(i).setRelation(sete.get(t[R]));
 	  }
@@ -135,7 +145,7 @@ public class Example2 extends Sketch{
 	  fill(255);
 	  textSize(20);
 	  
-	  text(""+_int(frameRate), 0+width*(1-posScl)/2, height- height *(1-posScl)/2);
+	  //text(""+_int(frameRate), 0+width*(1-posScl)/2, height- height *(1-posScl)/2);
 	}
 
 	void getLast(QuadTree  q){
@@ -172,8 +182,10 @@ public class Example2 extends Sketch{
 	  if(key.equals("t")){
 	    HashMap <String, HashMap> sete = createTable(t);
 	    for(int i = 0; i< population; i++){
-	      int R = _int(random(t.length)); 
-	      particles.get(i).setRelation(sete.get(t[R]));
+	      //int R = _int(random(t.length));
+	      //println(R);
+	      String type = particles.get(i).type;
+	      particles.get(i).setRelation(sete.get(type));
 	    }
 	  }
 	}
@@ -220,9 +232,10 @@ public class Example2 extends Sketch{
 		  void init(){
 		    close = new ArrayList<Particle>();
 		    //relation
-		    a = random(size/2, 25);
-		    b = random(a, 100);
 		    r = 150;
+		    a = random(size/2, r/2);
+		    b = random(r/2, r);
+		    
 		    hitBox.sizeX = r;
 		    hitBox.sizeY = r;
 		  }
@@ -230,12 +243,20 @@ public class Example2 extends Sketch{
 		  void behavior(){
 		    // represente it's behavior
 		    for(Particle p: close){
-		      Force = new PVector(p.pos.x - pos.x, p.pos.y - pos.y);
-		      float dis = dist(p.pos.x, p.pos.y, pos.x, pos.y);
+		      Force = new PVector(p.pos.x - pos.x, p.pos.y - pos.y).limit(maxForce);
+		      float dis = PVector.dist(p.pos,pos);
 		      Force.normalize();
-		      ze = attract(dis);
+		      if(dis < size) {
+		    	  ze = -pow(attract(size/2),2);
+		      }
+		      else
+		    	  ze = attract(dis);
 		      float fact = relation.get(p.type);
-		      ze *= fact;
+		      //println(fact, "*", ze);
+		      if(fact < 0 && ze < 0)
+		    	  ze *= -fact;
+		      else
+		    	  ze *= fact;
 		      Force.mult(ze);
 		      PVector flee = PVector.sub(pos,p.pos).mult(size/dis);
 		 
@@ -256,22 +277,25 @@ public class Example2 extends Sketch{
 		  }
 		  
 		  float attract(float X){
+			  float res;
 		    if(X < a){
-		      return abs((a-log(X)));
+		      res =  (a-log(X));
 		    }else if(X >a && X < (b-a)/2){
 		      //println("A");
-		      return abs((X - a)); 
+		      res =  (X - a); 
 		      
 		    }else if(X >(b-a)/2 && X < b){
 		       //println("B");
-		      return abs(-X +b);
+		      res =  -X +b;
 		    }
 		    else {
-		      Force.set(new PVector(random(-2,2), random(-2,2)));
+		      //Force.set(new PVector(random(-2,2), random(-2,2)));
 		      //println("C");
-		      return random(1);
+		      res =  random(1);
 		      
 		    }
+		    //println("res :", res, "dist:",X, "min :", a, "max",b);
+		    return res;
 		  }
 		  void display(){
 		    fill(col);
@@ -289,7 +313,7 @@ public class Example2 extends Sketch{
 		  PVector acc;
 		  float size = 15;
 		  color col;
-		  float maxForce = 100;
+		  float maxForce = 150f;
 		  CircleRange hitBox;
 		  CircleRange hitBox2;
 		  String type = "BASIC";
@@ -338,6 +362,7 @@ public class Example2 extends Sketch{
 		    noStroke();
 		    fill(col);
 		    ellipse(pos.x, pos.y, size, size);
+		    //rect(abs(hitBox2.x/2), abs(hitBox2.y/2), hitBox2.sizeX, hitBox2.sizeY);
 		  }
 		  
 		  void behavior(){
@@ -354,16 +379,17 @@ public class Example2 extends Sketch{
 		    //lastPos.set(pos.x, pos.y);
 		    behavior();
 		    acc.limit(maxForce);
-		    //acc.mult(deltaTime);
+		    //acc.mult(acc.mag());
+		    //acc.mult(100);
 		    vel.add(acc);
-		    vel.mult(5);
-		    vel.limit(200);
+		    //svel.mult(5);
+		    //vel.limit(50);
 		    vel.mult(deltaTime);
 		    //
 		    //
 		    pos.add(vel);
 		    acc.mult(0);
-		    vel.mult(0.98);
+		    vel.div(1.5f);
 		    edges();
 		    hitBox.x = pos.x;
 		    hitBox.y = pos.y;

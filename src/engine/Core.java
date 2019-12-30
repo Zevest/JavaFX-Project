@@ -92,10 +92,10 @@ public class Core extends Application {
     	
     	
     	//MouseEvent
-    	
     	scene.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
     	    @Override
     	    public void handle(MouseEvent mouseEvent) {
+    	    	
     	        switch(mouseEvent.getButton()) {
     	        case PRIMARY:
     	        	sketch.mouseButton = MOUSE_BUTTON.LEFT;

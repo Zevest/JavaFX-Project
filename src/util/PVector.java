@@ -58,11 +58,11 @@ public class PVector {
 	}
 	
 	public static PVector random2D() {
-		return new PVector(Math.random(), Math.random());
+		return new PVector(Util.random(), Util.random());
 	}
 	
 	public static PVector random3D() {
-		return new PVector(Math.random(), Math.random(), Math.random());
+		return new PVector(Util.random(), Util.random(), Util.random());
 	}
 	
 	public static PVector fromAngle(double angle) {

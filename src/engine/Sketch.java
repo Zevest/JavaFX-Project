@@ -14,6 +14,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import util.FileManager;
 import util.Util;
+import util.Noise;
 import util.color;
 
 
@@ -36,13 +37,14 @@ public class Sketch {
 	double yScale = 1;
 	
 	
-	public double PI = Math.PI;
-	public double HALF_PI = PI/2.0;
-	public double TWO_PI = 2*PI;
+	public float PI = (float) Math.PI;
+	public float HALF_PI = (float) PI/2.0f;
+	public float TWO_PI = (float) 2*PI;
 	public short width = 200, height = 200;
 	
 	boolean isFullScreen  = false;
 	boolean finished = false;
+	
 	
 	DRAW_MODE ellipseModeVal = DRAW_MODE.CENTER;
 	DRAW_MODE rectModeVal = DRAW_MODE.CORNER;
@@ -59,6 +61,8 @@ public class Sketch {
 	public float frameRate;
 	public float deltaTime;
 	public float deltaTimeMillis;
+	
+	
 	
 	private Canvas can; 
 	GraphicsContext pen;
@@ -119,18 +123,37 @@ public class Sketch {
 
 
 	
-	//utility Function
+	//////////////// utility Function ///////////////
 	
+	public final int _int(float o) {
+		return (int) o;
+	}
+	public final float _float(int o) {
+		return (float) o;
+	}
+	public final String _String(Object o) {
+		return o.toString();
+	}
+	
+	////////////////      MATH       ////////////////
 	public final float min(double a, double ...other) {
 		return (float) Util.min(a, other);
+	}
+	
+	public final float min(double[] a) {
+		return (float) Util.min(a[0],  a);
 	}
 	
 	public final float max(double a, double ...other) {
 		return (float) Util.max(a, other);
 	}
 	
+	public final float max(double[] a) {
+		return (float) Util.max(a[0],  a);
+	}
+	
 	public final float abs(double a) {
-		return (float) Util.abs(a);
+		return (float) Math.abs(a);
 	}
 	
 	public final float log(double a) {
@@ -145,25 +168,134 @@ public class Sketch {
 		return (float) Math.ceil(a);
 	}
 	
+	public final float round(double a) {
+		return (float) Math.round(a);
+	}
+	
+	public final float exp(double a) {
+		return (float) Math.exp(a);
+	}
+	
+	public final float mag(double a, double b) {
+		return (float) Math.sqrt(a*a + b*b);
+	}
+	
+	public final float mag(double a, double b, double c) {
+		return (float) Math.sqrt(a*a + b*b + c*c);
+	}
+	
 	public final float map(double value,double start1,double end1,double start2,double end2) {
 		return (float) Util.map(value, start1, end1, start2, end2);
+	}
+	
+	public final float norm(double value, double start, double stop) {
+		return (float) Util.map(value, start, stop, 0, 1);
 	}
 	
 	public final float lerp(double start, double end, double amt) {
 		return (float) Util.lerp(start, end, amt);
 	}
 	
-	public final int _int(float o) {
-		return (int) o;
+	public static float constrain(double val, double low, double high) {
+		return (float) Util.constrain(val, low, high);
 	}
-	public final float _float(int o) {
-		return (float) o;
+	
+	public static int constrain(long val, long low, long high) {
+		return (int)  Util.constrain(val, low, high);
 	}
-	public final String _String(Object o) {
-		return o.toString();
+	
+	public final float dist(double x1, double y1, double x2, double y2) {
+		return (float) Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2 - y1, 2));
+	}
+	
+	public final float dist(double x1, double y1, double z1, double x2, double y2, double z2) {
+		return (float) Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2 - y1, 2) + Math.pow(z2 - z1, 2));
+	}
+	
+	public final float sq(double a) {
+		return  (float) (a*a);
+	}
+	
+	public final float pow(double a, double b) {
+		return(float) Math.pow(a, b);
+	}
+	
+	public final float sqrt(double a ) {
+		return (float) Math.sqrt(a);
 	}
 	
 	
+	////////////// Trigonometry ////////////////////////
+	public final float sin(double a) {
+		return (float) Math.sin(a);
+	}
+	
+	public final float cos(double a) {
+		return (float) Math.cos(a);
+	}
+
+	public final float asin(double a) {
+		return (float) Math.asin(a);
+	}
+	
+	public final float acos(double a) {
+		return (float) Math.acos(a);
+	}
+	
+	public final float tan(double a) {
+		return (float) Math.tan(a);
+	}
+	
+	public final float atan(double a) {
+		return (float) Math.atan(a);
+	}
+	
+	public final float atan2(double x, double y) {
+		return (float) Math.atan2(x, y);
+	}
+	
+	public final float degrees(double angle) {
+		return (float) Math.toRadians(angle);
+	}
+	
+	public final float radians(double angle) {
+		return (float) Math.toDegrees(angle);
+	}
+	
+	///////////// Random ///////////////////
+	
+	public final float random(double max) {
+		return (float) Util.random(max);
+	}
+	
+	
+	public final float random(double min, double max) {
+		return (float) Util.random(min, max);
+	}
+	
+	
+	public final float randomGaussian() {
+		return (float) Util.randomGaussian();
+	}
+	
+	public final void randomSeed(long seed) {
+		Util.randomSeed(seed);
+	}
+	
+	public final void noiseSeed(long seed) {
+		Noise.changeSeed(seed);
+	}
+	
+	public final float noise(double x) {
+		return (float) Noise.noise2D((float)x, 0f);
+	}
+	
+	public final float noise(double x, double y) {
+		return (float) Noise.noise2D((float)x, (float)y);
+	}
+	public final float noise(double x, double y, double z) {
+		return (float) Noise.noise3D((float)x, (float)y, (float)z);
+	}
 	
 	public final color color(double c) {
 		double nColor = Math.max(0, Math.min(1.0, c/maxR));
@@ -241,14 +373,7 @@ public class Sketch {
 		System.out.print(buffer);
 	}
 	
-	public final float random(double max) {
-		return (float)(Math.random() * max);
-	}
-	
-	
-	public final float random(double min, double max) {
-		return (float)(min + Math.random() * (max - min));
-	}
+
 
 	public final void frameRate(float rate) {
 		targetFrameRate = rate;
@@ -266,13 +391,7 @@ public class Sketch {
 		isLoop = false;
 	}
 
-	public final float dist(double x1, double y1, double x2, double y2) {
-		return (float) Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2 - y1, 2));
-	}
-	
-	public final float dist(double x1, double y1, double z1, double x2, double y2, double z2) {
-		return (float) Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2 - y1, 2) + Math.pow(z2 - z1, 2));
-	}
+
 
 	/// Draw function
 	public final void clear() {

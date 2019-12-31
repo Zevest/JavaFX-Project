@@ -2,8 +2,7 @@ package engine;
 
 import java.util.ArrayList;
 
-import constant.COLOR_MODE;
-import constant.DRAW_MODE;
+import constant.SETTINGS;
 import javafx.scene.paint.Color;
 
 public class PenStack {
@@ -18,13 +17,13 @@ public class PenStack {
 	boolean  isStroked;
 	short strokeWeightVal;
 	String fontName;
-	DRAW_MODE ellipseModeVal;
-	DRAW_MODE rectModeVal;
+	SETTINGS ellipseModeVal;
+	SETTINGS rectModeVal;
 	boolean makingShape;
 	
 	int textSizeVal;
-	DRAW_MODE textAligneVal;
-	COLOR_MODE colorModeVal;
+	SETTINGS textAligneVal;
+	SETTINGS colorModeVal;
 	
 	PenStack(Sketch s){
 		verticesX = s.verticesX;

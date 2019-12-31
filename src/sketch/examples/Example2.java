@@ -1,14 +1,12 @@
 package sketch.examples;
 
-import constant.*;
-import engine.Sketch;
-import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import engine.Sketch;
+import javafx.scene.input.KeyCode;
 import util.PVector;
 import util.color;
-import javafx.scene.input.KeyCode;
 
 public class Example2 extends Sketch{
 	//LifeParticles
@@ -128,7 +126,7 @@ public class Example2 extends Sketch{
 	          other.display();
 	    } 
 	  }
-	  rectMode(DRAW_MODE.CENTER);
+	  rectMode(CENTER);
 
 	  stroke(255);
 	  noFill();
@@ -207,7 +205,7 @@ public class Example2 extends Sketch{
 	}
 	
 	public void mouseReleased() {
-		if(mouseButton == MOUSE_BUTTON.RIGHT)
+		if(mouseButton == RIGHT)
 			frameRate(300);
 	}
 	
@@ -340,7 +338,7 @@ public class Example2 extends Sketch{
 		    type = g;
 		  }  
 		    
-		  void setRelation(HashMap rel){
+		  void setRelation(HashMap<String, Float> rel){
 		    relation = rel;
 		  }
 		    
@@ -517,7 +515,7 @@ public class Example2 extends Sketch{
 	  void getChildDim(){
 	    if(child != null){
 	      for(QuadTree ch: child){
-	        //print(ch.boundary.x, ch.boundary.y, ch.boundary.sizeX, ch.boundary.sizeY, "; ");
+	        println(ch.boundary.x, ch.boundary.y, ch.boundary.sizeX, ch.boundary.sizeY, "; ");
 	    	  
 	      }
 	      //println();

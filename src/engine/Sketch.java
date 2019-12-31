@@ -2,19 +2,20 @@ package engine;
 
 import java.util.ArrayList;
 
-import constant.COLOR_MODE;
-import constant.DRAW_MODE;
-import constant.MOUSE_BUTTON;
+import constant.CURSOR;
+import constant.SETTINGS;
+import constant.CURSOR;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import util.FileManager;
-import util.Util;
 import util.Noise;
+import util.Util;
 import util.color;
 
 
@@ -31,38 +32,57 @@ public class Sketch {
 	boolean isStroked = true;
 	short strokeWeightVal = 1;
 	String fontName;
+	private float fontSizeVal = 11;
+	private Font currentFont = new Font(fontSizeVal);
+	
 	double xOffset = 0;
 	double yOffset = 0;
 	double xScale = 1;
 	double yScale = 1;
 	
-	
 	public float PI = (float) Math.PI;
 	public float HALF_PI = (float) PI/2.0f;
 	public float TWO_PI = (float) 2*PI;
 	public short width = 200, height = 200;
-	
+	public static final SETTINGS TOP = SETTINGS.TOP;
+	public static final SETTINGS BOTTOM = SETTINGS.BOTTOM;
+	public static final SETTINGS CENTER = SETTINGS.CENTER;
+	public static final SETTINGS LEFT = SETTINGS.LEFT;
+	public static final SETTINGS RIGHT = SETTINGS.RIGHT;
+	public static final SETTINGS CORNER = SETTINGS.CORNER;
+	public static final SETTINGS HSB = SETTINGS.HSB;
+	public static final SETTINGS RGB = SETTINGS.RGB;
+	public static final SETTINGS NEXT = SETTINGS.NEXT;
+	public static final SETTINGS BACK = SETTINGS.BACK;
+	public static final CURSOR ARROW = CURSOR.ARROW;
+	public static final CURSOR CROSS = CURSOR.CROSS;
+	public static final CURSOR HAND = CURSOR.HAND;
+	public static final CURSOR MOVE = CURSOR.MOVE;
+	public static final CURSOR TEXT = CURSOR.TEXT;
+	public static final CURSOR WAIT = CURSOR.WAIT;
+
 	boolean isFullScreen  = false;
 	boolean finished = false;
 	
 	
-	DRAW_MODE ellipseModeVal = DRAW_MODE.CENTER;
-	DRAW_MODE rectModeVal = DRAW_MODE.CORNER;
+	CURSOR cursor = ARROW;
+	
+	SETTINGS ellipseModeVal = SETTINGS.CENTER;
+	SETTINGS rectModeVal = SETTINGS.CORNER;
 	boolean makingShape = false;
 	
 	int textSizeVal = 15;
-	DRAW_MODE textAligneVal = DRAW_MODE.LEFT;
-	COLOR_MODE colorModeVal = COLOR_MODE.RGB;
+	private SETTINGS textAligneValX = SETTINGS.LEFT;
+	private SETTINGS textAligneValY = SETTINGS.BOTTOM;
+	SETTINGS colorModeVal = SETTINGS.RGB;
 	private double maxR=255, maxG=255, maxB=255, maxA=255;
-	DRAW_MODE imageModeVal = DRAW_MODE.CENTER;
+	private SETTINGS imageModeVal = SETTINGS.CENTER;
 	
 	private ArrayList<PenStack> infoStack = new ArrayList<PenStack>();
 	
 	public float frameRate;
 	public float deltaTime;
 	public float deltaTimeMillis;
-	
-	
 	
 	private Canvas can; 
 	GraphicsContext pen;
@@ -73,14 +93,20 @@ public class Sketch {
 	//Mouse
 	public float mouseX = 0;
 	public float mouseY = 0;
-	public MOUSE_BUTTON mouseButton = MOUSE_BUTTON.NONE;
+	public SETTINGS mouseButton = SETTINGS.NONE;
 	public String key;
 	public KeyCode keyCode;
 	public final String CODED = "CODED";
 	private final int useless = FileManager.init();
 	
+	
 	public Sketch(){}
 	
+	private static SETTINGS SETTINGS(int i) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	public void setup() {}
 	
 	public void draw() {}
@@ -524,23 +550,23 @@ public class Sketch {
 		pen.setLineWidth(size);
 	}
 	
-	public final void colorMode(COLOR_MODE mode) {
+	public final void colorMode(SETTINGS mode) {
 		colorModeVal = mode;
 	}
-	public final void colorMode(COLOR_MODE mode, double maxV) {
+	public final void colorMode(SETTINGS mode, double maxV) {
 		this.maxR = maxV;
 		this.maxG = maxV;
 		this.maxB = maxV;
 		this.maxA = maxV;
 		colorModeVal = mode;
 	}
-	public final void colorMode(COLOR_MODE mode, double maxR, double maxG, double maxB) {
+	public final void colorMode(SETTINGS mode, double maxR, double maxG, double maxB) {
 		this.maxR = maxR;
 		this.maxG = maxG;
 		this.maxB = maxB;
 		colorModeVal = mode;
 	}
-	public final void colorMode(COLOR_MODE mode, double maxR, double maxG, double maxB, double maxA) {
+	public final void colorMode(SETTINGS mode, double maxR, double maxG, double maxB, double maxA) {
 		this.maxR = maxR;
 		this.maxG = maxG;
 		this.maxB = maxB;
@@ -548,15 +574,15 @@ public class Sketch {
 		colorModeVal = mode;
 	}
 	
-	public final void ellipseMode(DRAW_MODE mode) {
+	public final void ellipseMode(SETTINGS mode) {
 		ellipseModeVal = mode;
 	}
 	
-	public final void rectMode(DRAW_MODE mode) {
+	public final void rectMode(SETTINGS mode) {
 		rectModeVal = mode;
 	}
 	
-	public final void imageMode(DRAW_MODE mode) {
+	public final void imageMode(SETTINGS mode) {
 		imageModeVal = mode;
 	}
 	
@@ -690,7 +716,8 @@ public class Sketch {
 	
 	public final void textFont(String name) {
 		fontName = name; 
-		pen.setFont(new Font(fontName, textSizeVal));
+		currentFont =  new Font(fontName, textSizeVal);
+		pen.setFont(currentFont);
 	}
 	
 	public final void rotate(double angle) {
@@ -701,14 +728,34 @@ public class Sketch {
 	
 	public final void text(String text, double x, double y) {
 		if(isFilled)
-			pen.fillText(text, x, y);
+			switch(textAligneValY) {
+			case BOTTOM:
+				pen.fillText(text, x, y);
+				break;
+			case CENTER:
+				pen.fillText(text, x, y+textSizeVal/2);
+				break;
+			case TOP:
+				pen.fillText(text, x, y+textSizeVal);
+				break;
+			}
 		if(isStroked)
-			pen.strokeText(text, x, y);
+			switch(textAligneValY) {
+			case BOTTOM:
+				pen.strokeText(text, x, y);
+				break;
+			case CENTER:
+				pen.strokeText(text, x, y+textSizeVal/2);
+				break;
+			case TOP:
+				pen.strokeText(text, x, y+textSizeVal);
+				break;
+			}
 	}
 	
-	public final void textAlign(DRAW_MODE mode) {
-		textAligneVal = mode;
-		switch(textAligneVal) {
+	public final void textAlign(SETTINGS modeX) {
+		textAligneValX = modeX;
+		switch(textAligneValX) {
 			case LEFT:
 				pen.setTextAlign(TextAlignment.LEFT);
 				break;
@@ -719,14 +766,39 @@ public class Sketch {
 				pen.setTextAlign(TextAlignment.RIGHT);
 				break;
 			default:
-				System.err.println("Error: Undefined AlignmentMode " + mode);
+				System.err.println("Error: Undefined AlignmentMode " + modeX);
+				System.exit(-1);
+		}
+	}
+	public final void textAlign(SETTINGS modeX, SETTINGS modeY) {
+		textAligneValX = modeX;
+		textAligneValY = modeY;
+		switch(textAligneValX) {
+			case LEFT:
+				pen.setTextAlign(TextAlignment.LEFT);
+				break;
+			case CENTER:
+				pen.setTextAlign(TextAlignment.CENTER);
+				break;
+			case RIGHT:
+				pen.setTextAlign(TextAlignment.RIGHT);
+				break;
+			default:
+				System.err.println("Error: Undefined AlignmentMode " + modeX +" "+ modeY );
 				System.exit(-1);
 		}
 	}
 
 	public final void textSize(int size) {
 		textSizeVal = size; 
-		pen.setFont(new Font(fontName, textSizeVal));
+		currentFont = new Font(fontName, textSizeVal);
+		pen.setFont(currentFont);
+	}
+	
+	public final float textWidth(String txt) {
+		final Text text = new Text(txt);
+        text.setFont(currentFont);
+        return (float) text.getLayoutBounds().getWidth();
 	}
 	
 	
@@ -798,4 +870,12 @@ public class Sketch {
 				System.err.println("Invalid Image Draw Mode : " + imageModeVal);
 		}
 	} 
+	
+	public final void cursor() {
+		cursor = ARROW;
+	}
+	
+	public final void cursor(CURSOR kind) {
+		cursor = kind;
+	}
 }

@@ -1,8 +1,7 @@
 package engine;
 
-import constant.COLOR_MODE;
-//import util.Math;
-import constant.MOUSE_BUTTON;
+import constant.CURSOR;
+import constant.SETTINGS;
 
 //import engine.Time;
 //import engine.Sketch;
@@ -11,6 +10,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 //import javafx.event.ActionEvent;
@@ -25,7 +25,7 @@ import javafx.stage.Screen;
 //import javafx.scene.text.Font;
 //import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import sketch.examples.Example2;
+import sketch.examples.Example3;
 
 
 public class Core extends Application {
@@ -40,7 +40,7 @@ public class Core extends Application {
 	private Group root;
 	private Scene scene;
 	protected Sketch sketch; 
-
+	protected CURSOR cursor = CURSOR.ARROW;
 	
 	
     public static void main(String[] args) {
@@ -52,6 +52,8 @@ public class Core extends Application {
     	setTargetFrameRate(sketch.getTargetFrameRate());
     	sketch.deltaTime = (float)elapsedTime/1000.0f;
     	sketch.deltaTimeMillis = (float)elapsedTime;
+    	if(cursor != sketch.cursor);
+    		setCursor(sketch.cursor);
     	if(sketch.isLoop) {
     		sketch.draw();
     		sketch.translate(0, 0);
@@ -62,6 +64,32 @@ public class Core extends Application {
     		Platform.exit();
     	}
     	
+    }
+    
+    private void setCursor(CURSOR c) {
+    	cursor = c;
+    	switch(cursor) {
+    	case CROSS:
+    		scene.setCursor(Cursor.CROSSHAIR);
+    		break;
+    	case HAND:
+    		scene.setCursor(Cursor.CLOSED_HAND);
+    		break;
+    	case MOVE:
+    		scene.setCursor(Cursor.MOVE);
+    		break;
+    	case TEXT:
+    		scene.setCursor(Cursor.TEXT);
+    		break;
+    	case WAIT:
+    		scene.setCursor(Cursor.WAIT);
+    		break;
+    	case ARROW:
+    	default:
+    		scene.setCursor(Cursor.DEFAULT);
+    		break;
+    	
+    	}
     }
 
     static void setFullScreen() {
@@ -82,12 +110,12 @@ public class Core extends Application {
     	mainStage.setFullScreenExitHint("");
     	canvas = new Canvas(200, 200);
     	scene.setFill(Color.LIGHTGRAY);
-    	sketch = new Example2();
+    	sketch = new Example3();
     	sketch.setContext(canvas);
     	
     	sketch.fill(255);
     	sketch.stroke(0);
-    	sketch.colorMode(COLOR_MODE.RGB, 255, 255, 255, 255);
+    	sketch.colorMode(SETTINGS.RGB, 255, 255, 255, 255);
     	sketch.setup();
     	
     	
@@ -98,22 +126,22 @@ public class Core extends Application {
     	    	
     	        switch(mouseEvent.getButton()) {
     	        case PRIMARY:
-    	        	sketch.mouseButton = MOUSE_BUTTON.LEFT;
+    	        	sketch.mouseButton = SETTINGS.LEFT;
     	        	break;
     	        case MIDDLE:
-    	        	sketch.mouseButton = MOUSE_BUTTON.CENTER;
+    	        	sketch.mouseButton = SETTINGS.CENTER;
     	        	break;
     	        case SECONDARY:
-    	        	sketch.mouseButton = MOUSE_BUTTON.RIGHT;
+    	        	sketch.mouseButton = SETTINGS.RIGHT;
     	        	break;
     	        case FORWARD:
-    	        	sketch.mouseButton = MOUSE_BUTTON.NEXT;
+    	        	sketch.mouseButton = SETTINGS.NEXT;
     	        	break;
     	        case BACK:
-    	        	sketch.mouseButton = MOUSE_BUTTON.BACK;
+    	        	sketch.mouseButton = SETTINGS.BACK;
     	        	break;
     	        default:
-    	        	sketch.mouseButton = MOUSE_BUTTON.NONE;
+    	        	sketch.mouseButton = SETTINGS.NONE;
     	        	break;
     	        }
     	        
@@ -127,7 +155,7 @@ public class Core extends Application {
     	    public void handle(MouseEvent mouseEvent) {
     	    	
     	    	sketch.mouseReleased();
-    	    	sketch.mouseButton = MOUSE_BUTTON.NONE;
+    	    	sketch.mouseButton = SETTINGS.NONE;
     	    }
     	});
     	

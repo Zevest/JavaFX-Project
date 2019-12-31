@@ -114,7 +114,7 @@ public class Noise {
 	     double sz = z - (double)z0;
 	     
 	     // Interpolate between grid point gradients
-	     double n0, n1, n2, n3, ix0, ix1, iy1, iy2, value;
+	     double n0, n1, ix0, ix1, iy1, iy2, value;
 	     n0 = dotGridGradient3D(x0, y0, z0, x, y, z);
 	     n1 = dotGridGradient3D(x1, y0, z0, x, y, z);
 	     ix0 = Util.lerp(n0, n1, sx);

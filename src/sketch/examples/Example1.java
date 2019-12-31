@@ -1,9 +1,7 @@
 package sketch.examples;
 
-import constant.DRAW_MODE;
 import engine.Sketch;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 
 public class Example1 extends Sketch {
 	Image img;
@@ -94,7 +92,7 @@ public class Example1 extends Sketch {
 		  void display(){
 		    float lw = width/w;
 		    float lh = height/h;
-		    textAlign(DRAW_MODE.CENTER);
+		    textAlign(CENTER);
 		    for(int i = 0; i < w*h; i++){
 		      int[] pos = coord(i);
 		      fill(255);
@@ -147,7 +145,7 @@ public class Example1 extends Sketch {
 		    //println(color(0, 200, 40));
 		    fill(color(0,200,40));
 		    //triangle(-.5*size,-.5*size,-.5*size,.5*size,.5*size,0);
-		    rectMode(DRAW_MODE.CENTER);
+		    rectMode(CENTER);
 		    triangle(-0.5*size, -0.5*size, -0.5*size , 0.5*size, 0.5*size, 0);
 		    popMatrix();
 		  }

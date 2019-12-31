@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import constant.CURSOR;
 import constant.SETTINGS;
-import constant.CURSOR;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;

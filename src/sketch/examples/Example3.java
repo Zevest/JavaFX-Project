@@ -35,7 +35,7 @@ public class Example3 extends Sketch {
 		}
 		//textFont("Arial", 50);
 		textSize(50);
-		String t = "Hi\nSalut";
+		String t = "Hi\nSalut\n";
 		text(t + textWidth(t), width/2, height/2);
 		line(width/2, height/2, width/2 + textWidth(t), height/2);
 		

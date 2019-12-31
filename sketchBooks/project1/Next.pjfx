@@ -1,0 +1,19 @@
+public void isItWorking() {
+	println("Yes", "it is indeed working");
+}
+
+class Test5{
+	String rep = "yes";
+	String question;
+	Test5(String question){
+		this.question = question + "?";
+	}
+	
+	void ask() {
+		println(this.question);
+	}
+	
+	void answer() {
+		println(this.rep);
+	}
+}

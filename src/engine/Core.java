@@ -3,9 +3,10 @@ package engine;
 import constant.CURSOR;
 import constant.SETTINGS;
 
+import sketch.template.*;
 //import engine.Time;
 //import engine.Sketch;
-
+import util.FileManager;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -27,7 +28,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import sketch.examples.Example3;
 
-
 public class Core extends Application {
 	public static int width = 800;
 	public static int height = 600;
@@ -41,10 +41,13 @@ public class Core extends Application {
 	private Scene scene;
 	protected Sketch sketch; 
 	protected CURSOR cursor = CURSOR.ARROW;
-	
+	static String dirPath = FileManager.path("sketchBooks","project1");
 	
     public static void main(String[] args) {
-        Application.launch(Core.class, args);
+        /*Application.launch(Core.class, args);*/
+    	System.out.println("Test");
+    	new SketchTemplate(FileManager.listFile(dirPath,"pjfx"), dirPath);
+    	Application.launch(Core.class, args);
     }
     
     
@@ -110,7 +113,7 @@ public class Core extends Application {
     	mainStage.setFullScreenExitHint("");
     	canvas = new Canvas(200, 200);
     	scene.setFill(Color.LIGHTGRAY);
-    	sketch = new Example3();
+    	sketch = new __UserDefault();
     	sketch.setContext(canvas);
     	
     	sketch.fill(255);

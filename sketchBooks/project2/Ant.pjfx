@@ -1,0 +1,31 @@
+class Ant{
+  int nodePos;
+  ArrayList<Integer> visited;
+  
+  
+  Ant(int i){
+    nodePos = i;
+    visited = new ArrayList<Integer>();
+    visited.add(nodePos);
+  }  
+  
+  ArrayList<Integer> genPossible(int n){
+    ArrayList<Integer> possible = new ArrayList<Integer>();
+    boolean can = true;
+    for(int i = 0; i < n; i++){
+      can = true;
+      for(int member: visited){
+        if(i == member){
+          can = false;
+          break;
+        }
+      }
+      if(can){
+        possible.add(i);
+      }
+    }
+    println(possible);
+    return possible;
+  }
+  
+}

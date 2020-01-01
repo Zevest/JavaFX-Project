@@ -8,7 +8,9 @@ public class SketchTemplate{
 			"import constant.SETTINGS",
 			"import util.PVector",
 			"import util.color",
-			"import engine.Sketch"
+			"import engine.Sketch",
+			"import java.util.ArrayList",
+			"import javafx.scene.image.Image"
 	};
 	String className = "__UserDefault";
 	String sketchFileName;

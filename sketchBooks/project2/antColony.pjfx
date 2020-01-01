@@ -1,0 +1,16 @@
+Graph g;
+public void setup(){
+  size(1280, 720);
+  g = new Graph(3);
+  g.connectAll();
+}
+
+public void draw(){
+  background(0);
+  g.display();
+}
+
+public void mousePressed(){
+  g.resetAll();
+  g.showOutput();
+}

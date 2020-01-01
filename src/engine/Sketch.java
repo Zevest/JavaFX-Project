@@ -101,11 +101,6 @@ public class Sketch {
 	
 	public Sketch(){}
 	
-	private static SETTINGS SETTINGS(int i) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public void setup() {}
 	
 	public void draw() {}
@@ -737,6 +732,8 @@ public class Sketch {
 			case TOP:
 				pen.fillText(text, x, y+textSizeVal);
 				break;
+			default:
+				break;
 			}
 		if(isStroked)
 			switch(textAligneValY) {
@@ -748,6 +745,8 @@ public class Sketch {
 				break;
 			case TOP:
 				pen.strokeText(text, x, y+textSizeVal);
+				break;
+			default:
 				break;
 			}
 	}

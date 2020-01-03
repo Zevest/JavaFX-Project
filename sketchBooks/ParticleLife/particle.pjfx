@@ -1,0 +1,119 @@
+class Particle {
+  PVector pos;
+  //PVector lastPos;
+  PVector vel;
+  PVector acc;
+  float size = 15;
+  color col;
+  float maxForce = 150f;
+  CircleRange hitBox;
+  CircleRange hitBox2;
+  String type = "BASIC";
+  HashMap<String, Float> relation;
+
+  
+  
+  float ze = 1;
+  
+  Particle(float x, float y){
+    pos = new PVector(x, y);
+    //lastPos = new PVector (x, y);
+    particles.add(this);
+    vel = new PVector(0, 0);
+    acc = new PVector(0, 0);
+    hitBox = new CircleRange(x, y, size);
+    init();
+  }
+  void init(){
+    relation.put("ALL", 1.0f);
+  }
+  
+  void setName(String g){
+    type = g;
+  }  
+    
+  void setRelation(HashMap<String, Float> rel){
+    relation = rel;
+  }
+    
+  void setColor(color c){
+    col = c;
+  }
+  
+  Particle(){
+    pos = new PVector(random(width), random(height));
+    particles.add(this);
+    //lastPos = new PVector(pos.x,pos.y);
+    vel = new PVector(0, 0);
+    acc = new PVector(0, 0);
+    hitBox = new CircleRange(pos.x, pos.y, size*2);
+    hitBox2 = new CircleRange(pos.x, pos.y, size*2);
+    init();
+  }
+  void display(){
+    noStroke();
+    fill(col);
+    ellipse(pos.x, pos.y, size, size);
+    //rect(abs(hitBox2.x/2), abs(hitBox2.y/2), hitBox2.sizeX, hitBox2.sizeY);
+  }
+  
+  void behavior(){
+    follow(mouseX, mouseY);
+  }
+  
+  void edges(){
+    if (pos.x > width) pos.x = 0;
+    if (pos.x < 0) pos.x = width;
+    if (pos.y > height) pos.y = 0;
+    if (pos.y < 0) pos.y = height;
+  }
+  void update(){
+    //lastPos.set(pos.x, pos.y);
+    behavior();
+    acc.limit(maxForce);
+    //acc.mult(acc.mag());
+    //acc.mult(100);
+    vel.add(acc);
+    //svel.mult(5);
+    //vel.limit(50);
+    vel.mult(deltaTime);
+    //
+    //
+    pos.add(vel);
+    acc.mult(0);
+    vel.div(1.5f);
+    edges();
+    hitBox.x = pos.x;
+    hitBox.y = pos.y;
+    if(pos.x > width/2)
+    	hitBox2.x = pos.x - width;
+	else 
+		hitBox2.x = pos.x + width;
+    
+	if(pos.y > height/2)
+    	hitBox2.y = pos.y - height;
+	else 
+		hitBox2.y = pos.y + height;
+  }
+  void appForce(PVector f){
+    acc.add(f);
+  }
+  
+  boolean collide(Particle p){
+    return dist(pos.x, pos.y, p.pos.x, p.pos.y) <= size/2 + p.size/2;
+  }
+  
+  void setClose(ArrayList<Particle> ps){
+    //println("notBehave" + ps);
+  }
+  void follow(PVector target){
+    PVector steer = new PVector(target.x - pos.x, target.y - pos.y);
+    steer.setMag(maxForce);
+    appForce(steer);
+  }
+  void follow(float x, float y){
+    PVector steer = new PVector(x - pos.x, y - pos.y);
+    steer.setMag(maxForce);
+    appForce(steer);
+  }
+}

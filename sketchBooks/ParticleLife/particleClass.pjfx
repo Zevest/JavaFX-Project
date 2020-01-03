@@ -1,0 +1,90 @@
+class Colored extends Particle{
+	  ArrayList<Particle> close;
+	  float a, b;
+	  float r;
+	  PVector Force;
+	  float ze;
+	  Colored(){
+	    super();
+	    init();
+	  }
+	  
+	  Colored(float x, float y){
+	    super(x, y);
+	    init();
+	  }
+	  
+	  void init(){
+	    close = new ArrayList<Particle>();
+	    //relation
+    r = 150;
+    a = random(size/2, r/2);
+    b = random(r/2, r);
+    
+    hitBox.sizeX = r;
+    hitBox.sizeY = r;
+  }
+
+  void behavior(){
+    // represente it's behavior
+    for(Particle p: close){
+      Force = new PVector(p.pos.x - pos.x, p.pos.y - pos.y).limit(maxForce);
+      float dis = PVector.dist(p.pos,pos);
+      Force.normalize();
+      if(dis < size) {
+    	  ze = -pow(attract(size/2),2);
+      }
+      else
+    	  ze = attract(dis);
+      float fact = relation.get(p.type);
+      //println(fact, "*", ze);
+      if(fact < 0 && ze < 0)
+    	  ze *= -fact;
+      else
+    	  ze *= fact;
+      Force.mult(ze);
+      PVector flee = PVector.sub(pos,p.pos).mult(size/dis);
+ 
+      if(dis < size){
+        appForce(flee);
+        //println(flee.mag());
+      }
+      
+      //Force.mult(1/(size/PVector.dist(p.pos,pos)));
+      //line(pos.x, pos.y,pos.x + Force.x, pos.y + Force.y);
+      //Force.mult(deltaTime);
+      appForce(Force);
+    }
+  }
+  
+  void setClose(ArrayList<Particle> ps){
+    close = new ArrayList<Particle>(ps);
+  }
+  
+  float attract(float X){
+	  float res;
+    if(X < a){
+      res =  (a-log(X));
+    }else if(X >a && X < (b-a)/2){
+      //println("A");
+      res =  (X - a); 
+      
+    }else if(X >(b-a)/2 && X < b){
+       //println("B");
+      res =  -X +b;
+    }
+    else {
+      //Force.set(new PVector(random(-2,2), random(-2,2)));
+      //println("C");
+      res =  random(1);
+      
+    }
+    //println("res :", res, "dist:",X, "min :", a, "max",b);
+    return res;
+  }
+  void display(){
+    fill(col);
+    noStroke();
+    super.display();
+  }
+}

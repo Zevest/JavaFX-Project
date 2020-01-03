@@ -1,14 +1,16 @@
-package sketch.template;
+package precompiler;
 
 import java.nio.file.Paths;
+import precompiler.TinyFileManager;
 
-import util.FileManager;
-
-public class SketchTemplate {/*
+public class PreCompiler {
 	String pakageName = "package sketch.template";
 	String[] importation = { "import constant.CURSOR", "import constant.SETTINGS", "import util.PVector",
 			"import util.color", "import engine.Sketch", "import java.util.ArrayList",
-			"import javafx.scene.image.Image" };
+			"import javafx.scene.image.Image",
+			"import java.util.HashMap",
+			"import javafx.scene.input.KeyCode"
+	};
 	String className = "__UserDefault";
 	String sketchFileName;
 	String classScope = "public class";
@@ -16,54 +18,57 @@ public class SketchTemplate {/*
 
 	String fileContent = "";
 	String directory = "";
-	static final String srcDir = Paths.get(System.getProperty("user.dir")).getParent().toString();
-	static final String buildDir = FileManager.path(srcDir, "src", "sketch", "template");
+	static final String srcDir = Paths.get(System.getProperty("user.dir")).toString();
+	static final String buildDir = TinyFileManager.path(srcDir, "sketch", "template");
 	static final String fileExtension = ".pjfx";
 	static String projectName = null;
-	static String dirPath = FileManager.path(srcDir, "sketchBooks");
+	static String dirPath = TinyFileManager.path(srcDir, "sketchBooks");
 	static String fullPath;
 
-	static String[] flags = {"--project-path", "--project-name"};
-	
+	//static  final String[] flags = { "--project-path", "--project-name" };
+
 	public static void main(String[] args) {
-		if(args != null) {
+		if (args != null && args.length > 0) {
 			System.out.println(args[0]);
-			for(int i = 0; i < args.length; ++i) {
-				switch(args[i]){
-					case "--project-path":
-						dirPath = args[++i];
-						break;
-					case "--project-name":
-						projectName = args[++i];
-						break;
-					default:
-						System.out.println("argument " + args[i] + " ignored");
-						break;
+			for (int i = 0; i < args.length; ++i) {
+				switch (args[i]) {
+				case "--project-path":
+					dirPath = args[++i];
+					break;
+				case "--project-name":
+					projectName = args[++i];
+					break;
+				default:
+					System.out.println("argument " + args[i] + " ignored");
+					break;
 				}
 			}
-			 
+
 		}
-		if(projectName == null)
+		if (projectName == null)
 			projectName = "project1";
-		fullPath = FileManager.path(dirPath, projectName);
-		
-		//System.out.println(dirPath + "\n" + buildDir + "\n" + srcDir + "\n" + projectName +"\n" + fullPath + "\n");
-		new SketchTemplate(FileManager.listFile(fullPath, "pjfx"), fullPath);
+		fullPath = TinyFileManager.path(dirPath, projectName);
+
+		// System.out.println(dirPath + "\n" + buildDir + "\n" + srcDir + "\n" +
+		// projectName +"\n" + fullPath + "\n");
+		new PreCompiler(TinyFileManager.listFile(fullPath, "pjfx"), fullPath);
 	}
 
-	public SketchTemplate() {
+	public PreCompiler() {
 		sketchFileName = "Sketch" + (int) (Math.random() * 1000000);
 		buildHeader();
 		closeFile();
 		saveFile();
-		//System.out.println(fileContent);
+		// System.out.println(fileContent);
 	}
 
-	public SketchTemplate(String[] sketchNames, String dir) {
-
+	public PreCompiler(String[] sketchNames, String dir) {
+		if (sketchNames == null || sketchNames.length == 0)
+			return;
 		buildHeader();
 		getSaveDirectory(dir);
-		//System.out.println(sketchNames);
+		// System.out.println(sketchNames);
+
 		for (String sketchName : sketchNames) {
 			System.out.println(sketchName);
 			sketchFileName = sketchName;
@@ -76,7 +81,7 @@ public class SketchTemplate {/*
 		saveFile();
 	}
 
-	public SketchTemplate(String sketchName) {
+	public PreCompiler(String sketchName) {
 		sketchFileName = sketchName;
 		buildHeader();
 		if (!getFileContent(sketchFileName + fileExtension)) {
@@ -87,7 +92,7 @@ public class SketchTemplate {/*
 		saveFile();
 	}
 
-	public SketchTemplate(String sketchName, String dir) {
+	public PreCompiler(String sketchName, String dir) {
 		sketchFileName = sketchName;
 		buildHeader();
 		getSaveDirectory(dir);
@@ -102,13 +107,13 @@ public class SketchTemplate {/*
 
 	private void getSaveDirectory(String dir) {
 		// TODO Auto-generated method stub
-		directory = FileManager.path(dir);
-		//System.out.println(directory);
+		directory = TinyFileManager.path(dir);
+		// System.out.println(directory);
 	}
 
 	private boolean getFileContent(String fileName) {
-		System.out.println(FileManager.path(directory, fileName));
-		String t = FileManager.getTextFileData(fileName, directory);
+		System.out.println(TinyFileManager.path(directory, fileName));
+		String t = TinyFileManager.getTextFileData(fileName, directory);
 		if (t == null)
 			return false;
 		fileContent += t;
@@ -130,8 +135,8 @@ public class SketchTemplate {/*
 
 	public void saveFile() {
 		String srcFileName = className + ".java";
-		// String fullPath = FileManager.path(srcDir, buildDir)
-		System.out.println("output >> " + FileManager.path(buildDir,"src", srcFileName) + "\n" + fileContent);
-		FileManager.newFile(srcFileName, buildDir, fileContent);
-	}*/
+		// String fullPath = TinyFileManager.path(srcDir, buildDir)
+		System.out.println("output >> " + TinyFileManager.path(buildDir, srcFileName) + "\n" + fileContent);
+		TinyFileManager.newFile(srcFileName, buildDir, fileContent);
+	}
 }

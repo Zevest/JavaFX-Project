@@ -13,6 +13,7 @@ public void draw() {
 	textSize(100);
 	rect(0, 0, 200, 200);
 	text("Hi", width/2, height/2);
+	ellipse(width/2, height/2, abs(100*sin(frameCount/100.0)),abs(100* cos(frameCount/100.0)));
 }
 
 

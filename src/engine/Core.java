@@ -2,11 +2,6 @@ package engine;
 
 import constant.CURSOR;
 import constant.SETTINGS;
-
-import sketch.template.*;
-//import engine.Time;
-//import engine.Sketch;
-import util.FileManager;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -26,7 +21,10 @@ import javafx.stage.Screen;
 //import javafx.scene.text.Font;
 //import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import sketch.examples.Example3;
+import sketch.template.__UserDefault;
+//import engine.Time;
+//import engine.Sketch;
+import util.FileManager;
 
 public class Core extends Application {
 	public static int width = 800;
@@ -46,20 +44,22 @@ public class Core extends Application {
     public static void main(String[] args) {
         /*Application.launch(Core.class, args);*/
     	System.out.println("Test");
-    	new SketchTemplate(FileManager.listFile(dirPath,"pjfx"), dirPath);
+    	//new SketchTemplate(FileManager.listFile(dirPath,"pjfx"), dirPath);
     	Application.launch(Core.class, args);
     }
-    
-    
+     
     protected void update(double elapsedTime){
+    	mainStage.setResizable(sketch.resizable);
     	setTargetFrameRate(sketch.getTargetFrameRate());
     	sketch.deltaTime = (float)elapsedTime/1000.0f;
     	sketch.deltaTimeMillis = (float)elapsedTime;
     	if(cursor != sketch.cursor);
     		setCursor(sketch.cursor);
     	if(sketch.isLoop) {
+    		sketch.pushMatrix();
     		sketch.draw();
-    		sketch.translate(0, 0);
+    		sketch.popMatrix();
+    		//sketch.translate(0, 0);
     	}
     	sketch.frameRate = (float) frameRate;
     	++sketch.frameCount;
@@ -105,6 +105,7 @@ public class Core extends Application {
     @Override
     public void start(Stage primaryStage) {
     	mainStage = primaryStage;
+    	//primaryStage.setResizable(false);
     	mainStage.setTitle("Hello World");
     	root = new Group();
     	scene = new Scene(root);
@@ -120,7 +121,8 @@ public class Core extends Application {
     	sketch.stroke(0);
     	sketch.colorMode(SETTINGS.RGB, 255, 255, 255, 255);
     	sketch.setup();
-    	
+    	//mainStage.sizeToScene();
+
     	
     	//MouseEvent
     	scene.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
@@ -211,6 +213,18 @@ public class Core extends Application {
     		
     	});
     	
+    	mainStage.widthProperty().addListener((obs, oldVal, newVal) -> {
+    	     // Do whatever you want
+    		sketch.size(newVal.intValue(), sketch.height);
+    	});
+
+    	mainStage.heightProperty().addListener((obs, oldVal, newVal) -> {
+    	     // Do whatever you want
+    		sketch.size(sketch.width, newVal.intValue());
+    	});
+    	
+    	
+    	
     	
     	////////////
     	//canvas.setWidth(sketch.width);
@@ -222,6 +236,14 @@ public class Core extends Application {
     	new Time(this).start();
     	mainStage.show();
     	
+    }
+    
+    protected void resizeX(int newVal) {
+    	sketch.size(newVal, sketch.height);
+    }
+    
+    protected void resizeY(int newVal) {
+    	sketch.size(sketch.width, newVal);
     }
     
     protected float getTargetFrameRate() {

@@ -12,6 +12,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Stage;
 import util.FileManager;
 import util.Noise;
 import util.Util;
@@ -34,10 +35,11 @@ public class Sketch {
 	private float fontSizeVal = 11;
 	private Font currentFont = new Font(fontSizeVal);
 	
-	double xOffset = 0;
-	double yOffset = 0;
-	double xScale = 1;
-	double yScale = 1;
+	double xOffset = 0.0;
+	double yOffset = 0.0;
+	double xScale = 1.0;
+	double yScale = 1.0;
+	double lastAngle = 0.0;
 	
 	public float PI = (float) Math.PI;
 	public float HALF_PI = (float) PI/2.0f;
@@ -88,7 +90,6 @@ public class Sketch {
 	private float targetFrameRate = 60f;
 	public long frameCount;
 	boolean isLoop = true;
-	
 	//Mouse
 	public float mouseX = 0;
 	public float mouseY = 0;
@@ -97,6 +98,7 @@ public class Sketch {
 	public KeyCode keyCode;
 	public final String CODED = "CODED";
 	private final int useless = FileManager.init();
+	boolean resizable = false;
 	
 	
 	public Sketch(){}
@@ -140,7 +142,6 @@ public class Sketch {
 		can = canvas;
 		pen = can.getGraphicsContext2D();
 	}
-
 
 	
 	//////////////// utility Function ///////////////
@@ -706,6 +707,9 @@ public class Sketch {
 		makingShape = s.makingShape;
 		textSizeVal = s.textSizeVal;
 		colorModeVal = s.colorModeVal;
+		lastAngle = s.lastAngle;
+		xScale = s.xScale;
+		yScale = s.yScale;
 	}
 	
 	public final void textFont(String name) {
@@ -716,7 +720,9 @@ public class Sketch {
 	
 	public final void rotate(double angle) {
 		//pen.rotate(angle);
+		pen.rotate(-lastAngle);
 		pen.rotate(angle *(180.0/Math.PI));
+		lastAngle = angle *(180.0/Math.PI);
 	}
 	
 	

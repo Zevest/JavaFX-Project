@@ -1,0 +1,196 @@
+	ArrayList<Particle> particles;
+	QuadTree qt;
+	AABB canvas;
+	boolean debug = false;
+	CircleRange cadre;
+	
+	int population = 1000;
+	boolean Boxed = false;
+	int clickCount = 0;
+	String[] t = {"red", "blue", "green", "yellow", "white", "magenta", "cyan", "idk1", "idk2", "idk3", "idk4", "idk5", "idk6", "idk7", "idk8"};
+	PVector[] pos;
+	
+	boolean followed = false;
+	
+	public void setup(){
+	  fullScreen();
+	  //frameRate(10);
+		//size(500, 500);
+	  //frameRate(10);
+	  particles = new ArrayList<Particle>();
+	  color[] col = {color(255,0,0), color(0,0,255), color(0,255,0), color(255,255,0), color(255,255,255),
+	                color(255,0,255), color(0,255,255)};
+	  ArrayList<color> colNull = new ArrayList<color>();
+	  if(col.length < t.length) {
+		  for(int i = 0; i < t.length-col.length; i++) {
+			  colNull.add( color(random(100,255), random(100,255), random(100,255)));
+		  }
+	  }
+	  HashMap <String, HashMap> sete = createTable(t);
+	  for(int i = 0; i< population; i++){
+	    int R = _int(random(t.length));
+	    new Colored();
+	    if(R >= col.length) {
+	    	particles.get(i).setColor(colNull.get(R-col.length));
+	    }else {
+	    	particles.get(i).setColor(col[R]);
+	    }
+	    particles.get(i).setName(t[R]);
+	    particles.get(i).setRelation(sete.get(t[R]));
+	  }
+	  pos = new PVector[2];
+	  pos[0] = new PVector(0,0);
+	  pos[1] = new PVector(width, height); 
+	  canvas = new AABB(pos[0].x, pos[0].y, abs(pos[1].x - pos[0].x),  abs(pos[1].y - pos[0].y));
+	}
+	
+	public void draw(){
+	  float scl = 1.05f;
+	  scale(scl);
+	  float posScl = (1.0f/scl);
+	  if(posScl <= 1.0f)
+		  translate(width * (posScl-1)/2, height* (posScl-1)/2);
+	  else
+		  translate(width/posScl, height/posScl);
+	  qt = new QuadTree(width/2, height/2, width, height, 0);
+	  background(0,80);
+	  noStroke();
+	  canvas.setPos(pos[0]);
+	  canvas.setSize(abs(pos[1].x - pos[0].x)*2, abs(pos[1].y - pos[0].y)*2);
+	  for(Particle p: particles){ 
+	    qt.insert(p);
+	    fill(127);
+	    if(!Boxed){
+	      p.display();
+	    }
+	  }
+	  
+	  //if(debug){
+	  //  ArrayList<Particle> notIn = new ArrayList<Particle>(particles);
+	  //  ArrayList<Particle> others = qt.queryRange(cadre);
+	  //  notIn.removeAll(others);
+	  //  for(Particle p: notIn){
+	  //    fill(255);
+	  //    p.display();  
+	  //  }
+	  //  for(Particle other: others){
+	  //        fill(255,0,0);
+	  //        other.display();
+	  //  }
+	  //  noFill();
+	  //  stroke(0,255,0);
+	  //  ellipse(cadre.x, cadre.y, cadre.sizeX, cadre.sizeY);
+	  //}
+	  
+	  //fill(0,255,2);
+	  for(Particle p: particles){
+	    ArrayList<Particle> others = qt.queryRange(p.hitBox);
+	    others.remove(p);
+	    p.setClose(others);
+	    for(Particle other: others){
+	      p.collide(other);
+	    }
+	    if(followed){
+	      p.follow(mouseX, mouseY);
+	    }
+	    p.update();
+	  }
+	  
+	  if(Boxed){
+	    noFill();
+	    stroke(0,255,0);
+	    //rectMode(CORNER);
+	    if(canvas instanceof CircleRange) {
+	    	ellipse(canvas.x, canvas.y, canvas.sizeX, canvas.sizeX);
+	    	
+	    }else if (canvas instanceof AABB){
+	    	rect(canvas.x, canvas.y, canvas.sizeX, canvas.sizeY);
+	    }
+	    ArrayList<Particle> others = qt.queryRange(canvas);
+	    //println(others.size());
+	    for(Particle other: others){
+	          other.display();
+	    } 
+	  }
+	  rectMode(CENTER);
+	
+	  stroke(255);
+	  noFill();
+	  //int i = 0;
+	  if(debug){
+	    for(AABB range: bounds){
+	      strokeWeight(1);
+	      // && range.containsPoint(mouseX, mouseY)){ 
+	      rect(range.x, range.y, range.sizeX, range.sizeY);
+	    }
+	  }
+	  bounds.removeAll(bounds);
+	  //noStroke();
+	  fill(255);
+	  textSize(20);
+	  
+	  //text(""+_int(frameRate), 0+width*(1-posScl)/2, height- height *(1-posScl)/2);
+	}
+	
+	void getLast(QuadTree  q){
+	  if(q.child.isEmpty()){
+	    print(q.points.size());
+	  }
+	  else {
+	    for(QuadTree ch: q.child){
+	      print(q.points.size(), ",");
+	      print("(");
+	      getLast(ch);
+	      print(" )");
+	    }
+	  }
+	  
+	}
+	
+	public void keyPressed(){
+	  if (key == CODED) {
+		  if (keyCode == KeyCode.ESCAPE) {
+			  exit();
+		  }
+	  }
+	  if(key.equals("d")){
+	    debug = !debug;
+	  }
+	  if(key.equals("r")){
+	    Boxed = !Boxed;
+	  }
+	  if(key.equals("y")){
+	    followed = !followed;
+	    println(followed);
+	  }
+	  if(key.equals("t")){
+	    HashMap <String, HashMap> sete = createTable(t);
+	    for(int i = 0; i< population; i++){
+	      //int R = _int(random(t.length));
+	      //println(R);
+	      String type = particles.get(i).type;
+	      particles.get(i).setRelation(sete.get(type));
+	    }
+	  }
+	}
+	
+	public void mousePressed(){
+	  switch(mouseButton) {
+		  case LEFT:
+			  pos[0] = new PVector(mouseX, mouseY);
+			  break;
+		  case RIGHT:
+			  frameRate(30);
+		  default:
+			  break;
+	  }
+	}
+	
+	public void mouseDragged(){
+	  pos[1].set(mouseX, mouseY);
+	}
+	
+	public void mouseReleased() {
+		if(mouseButton == RIGHT)
+			frameRate(300);
+	}

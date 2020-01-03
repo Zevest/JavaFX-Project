@@ -11,6 +11,9 @@ public class PenStack {
 	
 	double xOffset;
 	double yOffset;
+	double lastAngle;
+	double xScale;
+	double yScale;
 	Color fillColor;
 	Color strokeColor;
 	boolean isFilled;
@@ -41,6 +44,9 @@ public class PenStack {
 		makingShape = s.makingShape;
 		textSizeVal = s.textSizeVal;
 		colorModeVal = s.colorModeVal;
+		lastAngle = s.lastAngle;
+		xScale = s.xScale;
+		yScale = s.yScale; 
 	}
 	
 }

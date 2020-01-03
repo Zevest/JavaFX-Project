@@ -1,14 +1,3 @@
-package sketch.template;
-import constant.CURSOR;
-import constant.SETTINGS;
-import util.PVector;
-import util.color;
-import engine.Sketch;
-import java.util.ArrayList;
-import javafx.scene.image.Image;
-import java.util.HashMap;
-import javafx.scene.input.KeyCode;
-public class __UserDefault extends Sketch {
 public void setup() {
 	size(1920, 1080);
 	background(0, 0, 0, 255);
@@ -30,5 +19,4 @@ public void draw() {
 	//putPixels((int)(frameCount%width * width) + (int)frameCount%width, pink);
 	//updateFastPixels();
 	//text(""+frameRate, width/2, height/2);
-}
 }

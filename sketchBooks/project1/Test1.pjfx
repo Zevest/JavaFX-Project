@@ -1,7 +1,7 @@
 
 Test5 ques;
 public void setup() {
-	size(500, 500);
+	size(100, 100);
 	isItWorking();
 	ques = new Test5("Is is possible");
 	ques.ask();

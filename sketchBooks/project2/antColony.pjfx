@@ -1,16 +1,27 @@
 Graph g;
+int count = 0;
 public void setup(){
   size(1280, 720);
   g = new Graph(3);
   g.connectAll();
+  surface.setTitle("Hello");
+  //surface.setLocation(0, 0);
+  cursor();
 }
 
 public void draw(){
   background(0);
   g.display();
+  println("Drawing");
+  noLoop();
+  if(count >= 5)
+	  exit(5);
 }
 
 public void mousePressed(){
   g.resetAll();
-  g.showOutput();
+  //g.showOutput();
+  redraw();
+  ++count;
+  surface.setLocation(mouseX, mouseY);
 }

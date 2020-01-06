@@ -6,5 +6,6 @@ public enum CURSOR {
 		HAND,
 		MOVE,
 		TEXT, 
-		WAIT;
+		WAIT,
+		NONE;
 }

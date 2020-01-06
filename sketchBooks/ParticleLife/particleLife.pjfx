@@ -7,7 +7,7 @@
 	int population = 1000;
 	boolean Boxed = false;
 	int clickCount = 0;
-	String[] t = {"red", "blue", "green", "yellow", "white", "magenta", "cyan", "idk1", "idk2", "idk3", "idk4", "idk5", "idk6", "idk7", "idk8"};
+	String[] t = {"red", "blue", "green", "yellow", "white", "magenta", "cyan"};//, "idk1", "idk2", "idk3", "idk4", "idk5", "idk6", "idk7", "idk8"};
 	PVector[] pos;
 	
 	boolean followed = false;
@@ -26,7 +26,7 @@
 			  colNull.add( color(random(100,255), random(100,255), random(100,255)));
 		  }
 	  }
-	  HashMap <String, HashMap> sete = createTable(t);
+	  HashMap <String, HashMap<String,Float>> sete = createTable(t);
 	  for(int i = 0; i< population; i++){
 	    int R = _int(random(t.length));
 	    new Colored();
@@ -129,7 +129,7 @@
 	  fill(255);
 	  textSize(20);
 	  
-	  //text(""+_int(frameRate), 0+width*(1-posScl)/2, height- height *(1-posScl)/2);
+	  text(""+_int(frameRate), 0+width*(1-posScl)/2, height- height *(1-posScl)/2);
 	}
 	
 	void getLast(QuadTree  q){
@@ -164,7 +164,7 @@
 	    println(followed);
 	  }
 	  if(key.equals("t")){
-	    HashMap <String, HashMap> sete = createTable(t);
+	    HashMap <String, HashMap<String,Float>> sete = createTable(t);
 	    for(int i = 0; i< population; i++){
 	      //int R = _int(random(t.length));
 	      //println(R);

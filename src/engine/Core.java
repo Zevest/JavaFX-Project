@@ -39,15 +39,19 @@ public class Core extends Application {
 	private Group root;
 	private Scene scene;
 	protected Sketch sketch; 
+	static int error;
 	protected CURSOR cursor = CURSOR.ARROW;
 	static String dirPath = FileManager.path("sketchBooks","project1");
-	Window window;
+	static Window window;
 	Rectangle2D bound;
+	static boolean redraw = false;
+	
     public static void main(String[] args) {
         /*Application.launch(Core.class, args);*/
     	System.out.println("Test");
     	//new SketchTemplate(FileManager.listFile(dirPath,"pjfx"), dirPath);
     	Application.launch(Core.class, args);
+    	System.exit(error);
     }
      
     protected void update(double elapsedTime){
@@ -56,22 +60,34 @@ public class Core extends Application {
     	sketch.deltaTimeMillis = (float)elapsedTime;
     	if(cursor != sketch.cursor);
     		setCursor(sketch.cursor);
-		mainStage.setResizable(sketch.resizable);
-		//sketch.width = (short) scene.getWidth();
-		//sketch.height = (short) scene.getHeight();
-		//System.out.println(""+ canvas.getWidth() + " " + canvas.getHeight());
-    	if(sketch.isLoop) {
+		mainStage.setResizable(sketch.surface.resizable);
+		
+		
+		
+		if(!(sketch.surface.title.equals(mainStage.getTitle())))
+			mainStage.setTitle(sketch.surface.title);
+		
+		if((short)scene.getWidth() != sketch.width)
+			resizeX(scene.getWidth());
+		
+		if((short)scene.getHeight() != sketch.height)
+			resizeY(scene.getHeight());
+		
+    	if(sketch.isLoop || redraw) {
     		sketch.pushMatrix();
     		sketch.draw();
     		sketch.popMatrix();
-    		//sketch.translate(0, 0);
+    		redraw = false;
     	}
     	//sketch.println(width, height, sketch.width, sketch.height);
     	sketch.frameRate = (float) frameRate;
     	++sketch.frameCount;
     	if(sketch.finished == true) {
+    		error = sketch.error;
     		Platform.exit();
     	}
+    	
+    	
     	
     }
     
@@ -93,6 +109,9 @@ public class Core extends Application {
     	case WAIT:
     		scene.setCursor(Cursor.WAIT);
     		break;
+    	case NONE:
+    		scene.setCursor(Cursor.NONE);
+    		break;
     	case ARROW:
     	default:
     		scene.setCursor(Cursor.DEFAULT);
@@ -112,7 +131,7 @@ public class Core extends Application {
     public void start(Stage primaryStage) {
     	mainStage = primaryStage;
     	//primaryStage.setResizable(false);
-    	mainStage.setTitle("Hello World");
+    	
     	root = new Group();
     	scene = new Scene(root);
     	
@@ -127,9 +146,10 @@ public class Core extends Application {
     	sketch.stroke(0);
     	sketch.colorMode(SETTINGS.RGB, 255, 255, 255, 255);
     	bound = Screen.getPrimary().getVisualBounds();
-    	sketch.maxWidth = (int)bound.getWidth();
-    	sketch.Ppixels = new int[(int)bound.getWidth() * (int)bound.getHeight()];
-    	sketch.setup();
+    	//sketch.maxWidth = (int)bound.getWidth();
+    	mainStage.show();
+    	window = Window.getWindows().get(0);
+    	
     	
     	
     	
@@ -168,6 +188,7 @@ public class Core extends Application {
     	        
     	        
     	    	sketch.mousePressed();
+    	    	//sketch.mousePredded(mouseEvent)
     	    }
     	});
     	
@@ -176,6 +197,7 @@ public class Core extends Application {
     	    public void handle(MouseEvent mouseEvent) {
     	    	
     	    	sketch.mouseReleased();
+    	    	//sketch.mouseReleased(mouseEvent);
     	    	sketch.mouseButton = SETTINGS.NONE;
     	    }
     	});
@@ -185,6 +207,8 @@ public class Core extends Application {
     		public void handle(MouseEvent mouseEvent) {
     			sketch.mouseX =(float) mouseEvent.getX();
     			sketch.mouseY =(float) mouseEvent.getY();
+    			sketch.mouseMove();
+    			//sketch.mouseMove(mouseEvent);
     		}
     	});
     	
@@ -195,6 +219,7 @@ public class Core extends Application {
     	    	sketch.mouseX = (float)mouseEvent.getX();
     			sketch.mouseY = (float)mouseEvent.getY();
     	    	sketch.mouseDragged();
+    	    	//sketch.mouseDragged(event);
     	    }
     	});
     	
@@ -211,9 +236,12 @@ public class Core extends Application {
 				sketch.key = tmp.length() > 0 ? tmp : "CODED";
 				sketch.keyCode = event.getCode();
 				sketch.keyPressed();
+				//sketch.keyPressed(event);
 			}
     		
     	});
+    	
+
     	
     	scene.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
 
@@ -223,12 +251,29 @@ public class Core extends Application {
 				sketch.key = tmp.length() > 0 ? tmp : "CODED";
 				sketch.keyCode = event.getCode();
 				sketch.keyReleased();
+				//sketch.keyReleased(event);
 				//set KeyPressed to 0
 				//set keyCode to 0
 			}
     		
     	});
-    	//if(sketch.resizable) {
+    	
+    	scene.addEventHandler(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
+
+			@Override
+			public void handle(KeyEvent event) {
+				String tmp = event.getText();
+				sketch.key = tmp.length() > 0 ? tmp : "CODED";
+				sketch.keyCode = event.getCode();
+				sketch.keyTyped();
+				//sketch.keyTyped(event);
+				//set KeyPressed to 0
+				//set keyCode to 0
+			}
+    		
+    	});
+    	
+    	if(sketch.surface.resizable) {
 	    	mainStage.widthProperty().addListener((obs, oldVal, newVal) -> {
 	    	     // Do whatever you want
 	    		
@@ -240,27 +285,22 @@ public class Core extends Application {
 	    		
 	    		resizeY(scene.getHeight());
 	    	});
-    	//}
+    	}
     	
     	
     	
     	
     	////////////
-    	//canvas.setWidth(sketch.width);
-    	//canvas.setHeight(sketch.height);
+    
     	root.getChildren().add(canvas);
     	
+    	sketch.setup();
     	sketch.setContext(canvas);
     	
-    	mainStage.show();
-    	window = Window.getWindows().get(0);
-    	/*sketch.windowSizeX = window.getWidth();
-    	sketch.windowSizeY = window.getHeight();
-    	sketch.contentSizeX =scene.getWidth();
-    	sketch.contentSizeY = scene.getHeight();*/
+    	
+    	
     	new Time(this).start();
-    	/*sketch.width = (short)scene.getWidth();
-    	sketch.height =  (short)scene.getHeight();*/
+    
     	
     }
     
@@ -278,6 +318,11 @@ public class Core extends Application {
 
 	public void setTargetFrameRate(float targetFrameRate) {
 		this.targetFrameRate = targetFrameRate;
+	}
+	
+	static void setLocation(double x, double y) {
+		mainStage.setX(x);
+		mainStage.setY(y);
 	}
 	
 }

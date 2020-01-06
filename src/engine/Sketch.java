@@ -2,6 +2,7 @@ package engine;
 
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Stack;
 
 import constant.CURSOR;
 import constant.SETTINGS;
@@ -79,7 +80,8 @@ public class Sketch {
 	private double maxR = 255, maxG = 255, maxB = 255, maxA = 255;
 	private SETTINGS imageModeVal = SETTINGS.CENTER;
 
-	private ArrayList<PenStack> infoStack = new ArrayList<PenStack>();
+	private Stack<PenMatrix> matrtixStack = new Stack<PenMatrix>();
+	private Stack<PenStyle> styleStack = new Stack<PenStyle>();
 
 	public float frameRate;
 	public float deltaTime;
@@ -91,34 +93,29 @@ public class Sketch {
 	public long frameCount;
 	boolean isLoop = true;
 	// Mouse
-	public float mouseX = 0;
+	public float mouseX = FileManager.init();
 	public float mouseY = 0;
 	public SETTINGS mouseButton = SETTINGS.NONE;
 	public String key;
 	public KeyCode keyCode;
 	public final String CODED = "CODED";
-	private final int useless = FileManager.init();
-	boolean resizable = false;
 	PixelReader px;
 	PixelWriter pw;
 	public int minXChange = 0, minYChange = 0, maxXChange = width, maxYChange = height;
 	int maxWidth;
 	public color[] pixels;
 	int[] Ppixels;
+	String sketchName = "sketch";
+	public Surface surface = new Surface(sketchName);
 	// BufferedImage test;
-	
-	double windowSizeX = 1, windowSizeY = 1;
-	double contentSizeX = 1, contentSizeY = 1;
-	private int error;
+
+	static int error = 0;
 	
 	public final void loadPixels() {
-		//pixels = new color[width * height];
-		//Ppixels = new int[width * height];
 		WritableImage tmp = can.snapshot(null, null);
 		px = tmp.getPixelReader();
 		px.getPixels(0, 0, width, height, PixelFormat.getIntArgbInstance(), Ppixels, /*(int)abs((windowSizeY-height) * width)*/0 , maxWidth);
-		// BufferedImage bi = new BufferedImage( width, height,
-		// BufferedImage.TYPE_INT_ARGB);
+		
 		for (int j = 0; j < height; ++j) {
 			for (int i = 0; i < width; ++i) {
 				pixels[j * (width) + i] = color(px.getArgb(i, j));
@@ -137,6 +134,8 @@ public class Sketch {
 	}
 
 	public final void loadFastPixels() {
+		if(Ppixels == null || Ppixels.length < maxWidth*height)
+			Ppixels = new int[maxWidth * height];
 		WritableImage tmp = can.snapshot(null, null);
 		px = tmp.getPixelReader();
 		WritablePixelFormat<IntBuffer> format= PixelFormat.getIntArgbInstance();
@@ -147,12 +146,6 @@ public class Sketch {
 		int offset = constrain(minYChange, 0, height) * maxWidth + constrain(minXChange, 0, width);
 		pw = pen.getPixelWriter();
 		WritablePixelFormat<IntBuffer> format= PixelFormat.getIntArgbInstance();
-		/*pw.setPixels(
-				constrain(-(maxXChange - minXChange), 0, width),
-				constrain(- (maxYChange - minYChange), 0, height),
-				constrain(maxXChange - minXChange, 1, width), 
-				constrain((maxYChange - minYChange)*2, 1, height),
-				format, Ppixels, 0, maxWidth);*/
 		pw.setPixels(
 				constrain(minXChange, 0, width),
 				constrain(minYChange, 0, height),
@@ -171,7 +164,7 @@ public class Sketch {
 		if(Ppixels == null) {
 			System.err.println("Error: Pixel Array is empty");
 			System.err.println("You must use the loadFastPixel function First Before trying accessing the pixel");
-			exit();
+			exit(-1);
 		}
 		if(y < 0 || y >= height || x < 0 || x >= width) {
 			StackTraceElement[] temp = Thread.getAllStackTraces().get(Thread.currentThread());
@@ -181,7 +174,7 @@ public class Sketch {
 				System.err.println(temp[i].toString());
 			}
 			
-			exit();
+			exit(-1);
 		}
 		return color(Ppixels[y *maxWidth + x]);
 	}
@@ -217,14 +210,14 @@ public class Sketch {
 				System.err.println(temp[i].toString());
 			}
 			
-			exit();
+			exit(-1);
 		}
 		
 		try {
 			Ppixels[y * maxWidth + x] = col.getArgb();
 		} catch(ArrayIndexOutOfBoundsException e) {
 			e.printStackTrace();
-			exit();
+			exit(-1);
 		}
 	}
 
@@ -236,25 +229,36 @@ public class Sketch {
 
 	public void draw() {
 	}
-
+	
 	public void mousePressed() {
 	}
 
 	public void mouseReleased() {
 	}
 
+	public void mouseDragged() {
+	}
+
+	public void mouseMove() {
+	}
+	
 	public void keyPressed() {
 	}
 
 	public void keyReleased() {
 	}
-
-	public void mouseDragged() {
+	
+	public void keyTyped() {
+		
 	}
+
 
 	public final void size(int w, int h) {
 		width = (short) w;
 		can.setWidth(width);
+		if(maxWidth < w){
+			maxWidth = w;
+		}
 		height = (short) h;
 		can.setHeight(height);
 	}
@@ -262,9 +266,13 @@ public class Sketch {
 	public final void exit() {
 		finished = true;
 	}
-	private final void exit(int error) {
+	public final void exit(int error) {
 		finished = true;
-		this.error = error;
+		Sketch.error = error;
+	}
+	
+	public final void redraw() {
+		Core.redraw = true;
 	}
 
 	public final void fullScreen() {
@@ -277,10 +285,7 @@ public class Sketch {
 
 	}
 	
-	public final void setResizable(boolean bool) {
-		resizable = bool;
-	}
-
+	
 	protected final void setContext(Canvas canvas) {
 		can = canvas;
 		pen = can.getGraphicsContext2D();
@@ -761,7 +766,8 @@ public class Sketch {
 
 		}
 	}
-
+	
+	
 	public final void ellipse(double x, double y, double w) {
 		switch (ellipseModeVal) {
 		case CORNER:
@@ -842,17 +848,29 @@ public class Sketch {
 
 	public final void pushMatrix() {
 		pen.save();
-		infoStack.add(new PenStack(this));
+		matrtixStack.push(new PenMatrix(this));
 	}
 
 	public final void popMatrix() {
-		PenStack s = infoStack.get(infoStack.size() - 1);
+		PenMatrix s = matrtixStack.pop();
 		pen.restore();
-		infoStack.remove(infoStack.size() - 1);
 		verticesX = s.verticesX;
 		verticesY = s.verticesY;
 		xOffset = s.xOffset;
 		yOffset = s.yOffset;
+		makingShape = s.makingShape;
+		lastAngle = s.lastAngle;
+		xScale = s.xScale;
+		yScale = s.yScale;
+	}
+	
+	public final void pushStyle() {
+		styleStack.push(new PenStyle(this));
+	}
+	
+	public final void popStyle() {
+		PenStyle s = styleStack.pop();
+		pen.restore();
 		fillColor = s.fillColor;
 		strokeColor = s.strokeColor;
 		isFilled = s.isFilled;
@@ -861,14 +879,11 @@ public class Sketch {
 		fontName = s.fontName;
 		ellipseModeVal = s.ellipseModeVal;
 		rectModeVal = s.rectModeVal;
-		makingShape = s.makingShape;
 		textSizeVal = s.textSizeVal;
 		colorModeVal = s.colorModeVal;
-		lastAngle = s.lastAngle;
-		xScale = s.xScale;
-		yScale = s.yScale;
 	}
-
+	
+	
 	public final void textFont(String name) {
 		fontName = name;
 		currentFont = new Font(fontName, textSizeVal);
@@ -1066,12 +1081,18 @@ public class Sketch {
 	public final void cursor() {
 		cursor = ARROW;
 	}
-
+	
 	public final void cursor(CURSOR kind) {
 		cursor = kind;
+	}
+	
+	public final void noCursor() {
+		cursor = CURSOR.NONE;
 	}
 	
 	public final void smooth(boolean smoothing) {
 		pen.setImageSmoothing(smoothing);
 	}
+
+	
 }

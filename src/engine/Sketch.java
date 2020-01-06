@@ -101,23 +101,27 @@ public class Sketch {
 	boolean resizable = false;
 	PixelReader px;
 	PixelWriter pw;
-	private int minXChange = 0, minYChange = 0, maxXChange = width, maxYChange = height;
-
+	public int minXChange = 0, minYChange = 0, maxXChange = width, maxYChange = height;
+	int maxWidth;
 	public color[] pixels;
-	private int[] Ppixels;
+	int[] Ppixels;
 	// BufferedImage test;
-
+	
+	double windowSizeX = 1, windowSizeY = 1;
+	double contentSizeX = 1, contentSizeY = 1;
+	private int error;
+	
 	public final void loadPixels() {
-		pixels = new color[width * height];
-		Ppixels = new int[width * height];
+		//pixels = new color[width * height];
+		//Ppixels = new int[width * height];
 		WritableImage tmp = can.snapshot(null, null);
 		px = tmp.getPixelReader();
-		px.getPixels(0, 0, width, height, PixelFormat.getIntArgbInstance(), Ppixels, 0, width);
+		px.getPixels(0, 0, width, height, PixelFormat.getIntArgbInstance(), Ppixels, /*(int)abs((windowSizeY-height) * width)*/0 , maxWidth);
 		// BufferedImage bi = new BufferedImage( width, height,
 		// BufferedImage.TYPE_INT_ARGB);
 		for (int j = 0; j < height; ++j) {
 			for (int i = 0; i < width; ++i) {
-				pixels[j * width + i] = color(px.getArgb(i, j));
+				pixels[j * (width) + i] = color(px.getArgb(i, j));
 			}
 		}
 	}
@@ -134,47 +138,93 @@ public class Sketch {
 
 	public final void loadFastPixels() {
 		WritableImage tmp = can.snapshot(null, null);
-		Ppixels = new int[width * height];
 		px = tmp.getPixelReader();
-		px.getPixels(0, 0, width, height, PixelFormat.getIntArgbInstance(), Ppixels, 0, width);
+		WritablePixelFormat<IntBuffer> format= PixelFormat.getIntArgbInstance();
+		px.getPixels(0, 0, width, height, format, Ppixels,  0, maxWidth);
 	}
 
 	public final void updateFastPixels() {
+		int offset = constrain(minYChange, 0, height) * maxWidth + constrain(minXChange, 0, width);
 		pw = pen.getPixelWriter();
+		WritablePixelFormat<IntBuffer> format= PixelFormat.getIntArgbInstance();
+		/*pw.setPixels(
+				constrain(-(maxXChange - minXChange), 0, width),
+				constrain(- (maxYChange - minYChange), 0, height),
+				constrain(maxXChange - minXChange, 1, width), 
+				constrain((maxYChange - minYChange)*2, 1, height),
+				format, Ppixels, 0, maxWidth);*/
 		pw.setPixels(
-				/*constrain(minXChange, 0, width)*/0,
-				/*constrain(minYChange, 0, height)*/0,
-				/*constrain(maxXChange - minXChange, 0, width)*/width, 
-				/*constrain(maxYChange - minXChange, 0, height)*/height,
-				PixelFormat.getIntArgbInstance(), Ppixels, 0, width);
+				constrain(minXChange, 0, width),
+				constrain(minYChange, 0, height),
+				constrain(maxXChange - minXChange, 1, width), 
+				constrain(maxYChange - minYChange, 1, height),
+				format, Ppixels, offset, maxWidth
+				);
+		
 		minXChange = width;
 		minYChange = height;
-		maxXChange = 1;
-		maxYChange = 1;
+		maxXChange = 0;
+		maxYChange = 0;
 	}
 
-	public final void putPixels(int i, color col) {
+	public final color getPixels(int x, int y) {
+		if(Ppixels == null) {
+			System.err.println("Error: Pixel Array is empty");
+			System.err.println("You must use the loadFastPixel function First Before trying accessing the pixel");
+			exit();
+		}
+		if(y < 0 || y >= height || x < 0 || x >= width) {
+			StackTraceElement[] temp = Thread.getAllStackTraces().get(Thread.currentThread());
+			StackTraceElement e = temp[3];
+			System.err.printf("java.lang.IllegalArgumentException at function %s in (%s:%d): Coordinates (%d, %d) out of range(%d, %d)\n", temp[2].getMethodName(),e.getFileName(), e.getLineNumber(),x, y, width, height);
+			for(int i = 4; i < temp.length; ++i) {
+				System.err.println(temp[i].toString());
+			}
 			
-		
-		int x = i % width;
-		int y = i / width;
+			exit();
+		}
+		return color(Ppixels[y *maxWidth + x]);
+	}
+	
+	public final void putPixels(int x, int y, color col) {
+		if(Ppixels == null) {
+			System.err.println("Error: Pixel Array is empty");
+			System.err.println("You must use the loadFastPixel function First Before trying accessing the pixel");
+			System.exit(-1);
+			return;
+		}
+
 		if (x < minXChange)
 			minXChange = x;
-		if (x > maxXChange)
-			maxXChange = x+1;
 		if (y < minYChange)
 			minYChange = y;
+		
+		if (x > maxXChange)
+			maxXChange = x;
 		if (y > maxYChange)
-			maxYChange = y+1;
-		/*println(constrain(minXChange, 0, width-1),
-				constrain(minYChange, 0, height-1),
-				constrain(maxXChange - minXChange, 0, width), 
-				constrain(maxYChange - minXChange, 0, height));*/
+			maxYChange = y;
+		
+		if(minXChange >= maxXChange)
+			maxXChange = minXChange+1;
+		if(minYChange >= maxYChange)
+			maxYChange = minYChange+1;
+
+		if(y < 0 || y >= height || x < 0 || x >= width) {
+			StackTraceElement[] temp = Thread.getAllStackTraces().get(Thread.currentThread());
+			StackTraceElement e = temp[3];
+			System.err.printf("java.lang.IllegalArgumentException at function %s in (%s:%d): Coordinates (%d, %d) out of range(%d, %d)\n", temp[2].getMethodName(),e.getFileName(), e.getLineNumber(),x, y, width, height);
+			for(int i = 4; i < temp.length; ++i) {
+				System.err.println(temp[i].toString());
+			}
+			
+			exit();
+		}
+		
 		try {
-			Ppixels[i] = col.getArgb();
-		} catch(Exception e) {
-			System.err.printf("Error: Index %d out of bounds for length %d\n", i, width*height);
+			Ppixels[y * maxWidth + x] = col.getArgb();
+		} catch(ArrayIndexOutOfBoundsException e) {
 			e.printStackTrace();
+			exit();
 		}
 	}
 
@@ -212,15 +262,23 @@ public class Sketch {
 	public final void exit() {
 		finished = true;
 	}
+	private final void exit(int error) {
+		finished = true;
+		this.error = error;
+	}
 
 	public final void fullScreen() {
 		isFullScreen = true;
 		Core.setFullScreen();
 		width = (short) Core.width;
-		height = (short) Core.height;
 		can.setWidth(width);
+		height = (short) Core.height;
 		can.setHeight(height);
 
+	}
+	
+	public final void setResizable(boolean bool) {
+		resizable = bool;
 	}
 
 	protected final void setContext(Canvas canvas) {
@@ -1011,5 +1069,9 @@ public class Sketch {
 
 	public final void cursor(CURSOR kind) {
 		cursor = kind;
+	}
+	
+	public final void smooth(boolean smoothing) {
+		pen.setImageSmoothing(smoothing);
 	}
 }

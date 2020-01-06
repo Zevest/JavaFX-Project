@@ -53,20 +53,21 @@ public class Main {
         String projectName = "PixelTest";//"Test";
         
 		String file = Paths.get("sketch", "template", "__UserDefault.java").toString();
-		//String file = Paths.get("src","sketch", "template", "__UserDefault.java").toString();
-		// TODO: Change to a dynamic or platform independant path
+		String engine = Paths.get("engine", "COre.java").toString();
+//		String file = Paths.get("src","sketch", "template", "__UserDefault.java").toString();
+//	    TODO: Change to a dynamic or platform independant path
 		String modulePath = "C:\\dev\\libs\\java\\openjfx-13.0.1_windows-x64_bin-sdk\\javafx-sdk-13.0.1\\lib"; 
 		String buildPath = Paths.get(System.getProperty("user.dir")).toString();
 		
 		String srcPath = Paths.get(System.getProperty("user.dir"), "src").toString();
-		//String srcPath = Paths.get(System.getProperty("user.dir")).toString();
+//		String srcPath = Paths.get(System.getProperty("user.dir")).toString();
 		
 		
 		String preCompileLine = "java -cp \"" + buildPath + "\" precompiler.PreCompiler";
-	//	String preCompileLine = "java precompiler.PreCompiler";
+//		String preCompileLine = "java precompiler.PreCompiler";
 		String preCompileArgs = "--project-path \"" + projectPath + "\" --project-name " + projectName;
-		String compile = "javac --module-path \""+modulePath+ "\" --add-modules javafx.controls " + file;
-		String runLine = "java --module-path \""+modulePath+"\" --add-modules javafx.controls -Djavafx.animation.fullspeed=true -Dfile.encoding=Cp1252 engine.Core";
+		String compile = "javac --module-path \""+modulePath+ "\" --add-modules javafx.controls " + file + " " + engine;
+		String runLine = "java -XX:+UseParallelGC -Xms1536m -Xmx1536m -XX:NewRatio=2 --module-path \""+modulePath+"\" --add-modules javafx.controls -Djavafx.animation.fullspeed=true -Dfile.encoding=Cp1252 engine.Core";
 		
 		 
 		

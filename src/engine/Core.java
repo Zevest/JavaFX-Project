@@ -21,6 +21,7 @@ import javafx.stage.Screen;
 //import javafx.scene.text.Font;
 //import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import sketch.template.__UserDefault;
 //import engine.Time;
 //import engine.Sketch;
@@ -40,7 +41,8 @@ public class Core extends Application {
 	protected Sketch sketch; 
 	protected CURSOR cursor = CURSOR.ARROW;
 	static String dirPath = FileManager.path("sketchBooks","project1");
-	
+	Window window;
+	Rectangle2D bound;
     public static void main(String[] args) {
         /*Application.launch(Core.class, args);*/
     	System.out.println("Test");
@@ -49,18 +51,22 @@ public class Core extends Application {
     }
      
     protected void update(double elapsedTime){
-    	mainStage.setResizable(sketch.resizable);
     	setTargetFrameRate(sketch.getTargetFrameRate());
     	sketch.deltaTime = (float)elapsedTime/1000.0f;
     	sketch.deltaTimeMillis = (float)elapsedTime;
     	if(cursor != sketch.cursor);
     		setCursor(sketch.cursor);
+		mainStage.setResizable(sketch.resizable);
+		//sketch.width = (short) scene.getWidth();
+		//sketch.height = (short) scene.getHeight();
+		//System.out.println(""+ canvas.getWidth() + " " + canvas.getHeight());
     	if(sketch.isLoop) {
     		sketch.pushMatrix();
     		sketch.draw();
     		sketch.popMatrix();
     		//sketch.translate(0, 0);
     	}
+    	//sketch.println(width, height, sketch.width, sketch.height);
     	sketch.frameRate = (float) frameRate;
     	++sketch.frameCount;
     	if(sketch.finished == true) {
@@ -120,8 +126,18 @@ public class Core extends Application {
     	sketch.fill(255);
     	sketch.stroke(0);
     	sketch.colorMode(SETTINGS.RGB, 255, 255, 255, 255);
+    	bound = Screen.getPrimary().getVisualBounds();
+    	sketch.maxWidth = (int)bound.getWidth();
+    	sketch.Ppixels = new int[(int)bound.getWidth() * (int)bound.getHeight()];
     	sketch.setup();
+    	
+    	
+    	
+    	
+    	//scene.
     	//mainStage.sizeToScene();
+    	//mainStage.setHeight(sketch.height+35);
+    	//mainStage.setWidth(sketch.width+17);
 
     	
     	//MouseEvent
@@ -212,16 +228,19 @@ public class Core extends Application {
 			}
     		
     	});
-    	
-    	mainStage.widthProperty().addListener((obs, oldVal, newVal) -> {
-    	     // Do whatever you want
-    		sketch.size(newVal.intValue(), sketch.height);
-    	});
-
-    	mainStage.heightProperty().addListener((obs, oldVal, newVal) -> {
-    	     // Do whatever you want
-    		sketch.size(sketch.width, newVal.intValue());
-    	});
+    	//if(sketch.resizable) {
+	    	mainStage.widthProperty().addListener((obs, oldVal, newVal) -> {
+	    	     // Do whatever you want
+	    		
+	    		resizeX(scene.getWidth());
+	    	});
+	
+	    	mainStage.heightProperty().addListener((obs, oldVal, newVal) -> {
+	    	     // Do whatever you want
+	    		
+	    		resizeY(scene.getHeight());
+	    	});
+    	//}
     	
     	
     	
@@ -233,17 +252,24 @@ public class Core extends Application {
     	
     	sketch.setContext(canvas);
     	
-    	new Time(this).start();
     	mainStage.show();
+    	window = Window.getWindows().get(0);
+    	/*sketch.windowSizeX = window.getWidth();
+    	sketch.windowSizeY = window.getHeight();
+    	sketch.contentSizeX =scene.getWidth();
+    	sketch.contentSizeY = scene.getHeight();*/
+    	new Time(this).start();
+    	/*sketch.width = (short)scene.getWidth();
+    	sketch.height =  (short)scene.getHeight();*/
     	
     }
     
-    protected void resizeX(int newVal) {
-    	sketch.size(newVal, sketch.height);
+    protected void resizeX(double newVal) {
+    	sketch.size((int)newVal, sketch.height);
     }
     
-    protected void resizeY(int newVal) {
-    	sketch.size(sketch.width, newVal);
+    protected void resizeY(double newVal) {
+    	sketch.size(sketch.width,(int) newVal);
     }
     
     protected float getTargetFrameRate() {

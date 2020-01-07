@@ -41,14 +41,14 @@ public class Core extends Application {
 	protected Sketch sketch; 
 	static int error;
 	protected CURSOR cursor = CURSOR.ARROW;
-	static String dirPath = FileManager.path("sketchBooks","project1");
+	static String dirPath = FileManager.path("sketchBooks","project3");
 	static Window window;
-	Rectangle2D bound;
+	static Rectangle2D bound;
 	static boolean redraw = false;
 	
     public static void main(String[] args) {
         /*Application.launch(Core.class, args);*/
-    	System.out.println("Test");
+    	System.out.println("test 2");
     	//new SketchTemplate(FileManager.listFile(dirPath,"pjfx"), dirPath);
     	Application.launch(Core.class, args);
     	System.exit(error);
@@ -62,16 +62,17 @@ public class Core extends Application {
     		setCursor(sketch.cursor);
 		mainStage.setResizable(sketch.surface.resizable);
 		
-		
-		
 		if(!(sketch.surface.title.equals(mainStage.getTitle())))
 			mainStage.setTitle(sketch.surface.title);
 		
-		if((short)scene.getWidth() != sketch.width)
+		if((short)scene.getWidth() != sketch.surface.w)
 			resizeX(scene.getWidth());
 		
-		if((short)scene.getHeight() != sketch.height)
+		if((short)scene.getHeight() != sketch.surface.h)
 			resizeY(scene.getHeight());
+		
+		sketch.width = (short) sketch.surface.w;
+		sketch.height = (short) sketch.surface.h;
 		
     	if(sketch.isLoop || redraw) {
     		sketch.pushMatrix();
@@ -121,7 +122,7 @@ public class Core extends Application {
     }
 
     static void setFullScreen() {
-    	Rectangle2D bound = Screen.getPrimary().getVisualBounds();
+    	bound = Screen.getPrimary().getVisualBounds();
     	width = (int)bound.getWidth();
     	height = (int)bound.getHeight();
     	mainStage.setFullScreen(true);
@@ -138,12 +139,12 @@ public class Core extends Application {
     	mainStage.setScene(scene);
     	mainStage.setFullScreenExitHint("");
     	canvas = new Canvas(200, 200);
-    	scene.setFill(Color.LIGHTGRAY);
+    	scene.setFill(Color.BLACK);
     	sketch = new __UserDefault();
     	sketch.setContext(canvas);
-    	
     	sketch.fill(255);
     	sketch.stroke(0);
+    	sketch.strokeWeight(1);
     	sketch.colorMode(SETTINGS.RGB, 255, 255, 255, 255);
     	bound = Screen.getPrimary().getVisualBounds();
     	//sketch.maxWidth = (int)bound.getWidth();
@@ -155,9 +156,8 @@ public class Core extends Application {
     	
     	
     	//scene.
-    	//mainStage.sizeToScene();
-    	//mainStage.setHeight(sketch.height+35);
-    	//mainStage.setWidth(sketch.width+17);
+    	//
+    	//
 
     	
     	//MouseEvent
@@ -188,7 +188,7 @@ public class Core extends Application {
     	        
     	        
     	    	sketch.mousePressed();
-    	    	//sketch.mousePredded(mouseEvent)
+    	    	//sketch.mousePressed(mouseEvent)
     	    }
     	});
     	
@@ -294,10 +294,14 @@ public class Core extends Application {
     
     	root.getChildren().add(canvas);
     	
-    	sketch.setup();
+    	
     	sketch.setContext(canvas);
-    	
-    	
+    	sketch.displayWidth = (short) bound.getWidth();
+    	sketch.displayHeight = (short) bound.getHeight();
+    	sketch.setup();
+    	mainStage.sizeToScene();
+    	//mainStage.setHeight(sketch.height+35);
+    	//mainStage.setWidth(sketch.width+17);
     	
     	new Time(this).start();
     
@@ -305,11 +309,11 @@ public class Core extends Application {
     }
     
     protected void resizeX(double newVal) {
-    	sketch.size((int)newVal, sketch.height);
+    	sketch.size((int)newVal, (int) sketch.surface.h);
     }
     
     protected void resizeY(double newVal) {
-    	sketch.size(sketch.width,(int) newVal);
+    	sketch.size((int) sketch.surface.w,(int) newVal);
     }
     
     protected float getTargetFrameRate() {

@@ -36,13 +36,10 @@ public class Main {
 		return s;
 	}
 	*/
-	public static void main(String[] args) throws InterruptedException
-    {
-        Runtime.getRuntime().addShutdownHook(new Thread()
-        {
+	public static void main(String[] args) throws InterruptedException {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
-            public void run()
-            {
+            public void run() {
             	System.out.println("Killing all Processus");
                 Main.destroyAllProcess();	
                 
@@ -50,7 +47,7 @@ public class Main {
         });
 		
         String projectPath = Paths.get(System.getProperty("user.dir"),"sketchBooks").toString();//"C:\\dev\\pjfx";//
-        String projectName = "project2";//"Test";
+        String projectName = "project3";//"Test";
         
 		String file = Paths.get("sketch", "template", "__UserDefault.java").toString();
 		String engine = "";//Paths.get("engine", "COre.java").toString();
@@ -61,7 +58,6 @@ public class Main {
 		
 		String srcPath = Paths.get(System.getProperty("user.dir"), "src").toString();
 //		String srcPath = Paths.get(System.getProperty("user.dir")).toString();
-		
 		
 		String preCompileLine = "java -cp \"" + buildPath + "\" precompiler.PreCompiler";
 //		String preCompileLine = "java precompiler.PreCompiler";
@@ -114,7 +110,7 @@ public class Main {
 	
 	private static void printErrors(String cmd, InputStream ins) throws Exception {
         String line = null;
-        BufferedReader in = new BufferedReader(
+        BufferedReader in = new BufferedReader(	
             new InputStreamReader(ins));
         while ((line = in.readLine()) != null) {
             System.err.println(cmd + " " + line);

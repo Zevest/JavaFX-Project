@@ -12,7 +12,7 @@ public class PenStyle {
 	Color strokeColor;
 	boolean isFilled;
 	boolean  isStroked;
-	short strokeWeightVal;
+	float strokeWeightVal;
 	String fontName;
 	SETTINGS ellipseModeVal;
 	SETTINGS rectModeVal;

@@ -37,6 +37,11 @@ public class Surface {
 		Core.setLocation(x, y);
 	}
 	
+	void setSize(double w, double h) {
+		this.w = w;
+		this.h = h;
+	}
+	
 
 	
 }

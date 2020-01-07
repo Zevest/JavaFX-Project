@@ -23,5 +23,5 @@ public void mousePressed(){
   //g.showOutput();
   redraw();
   ++count;
-  surface.setLocation(mouseX, mouseY);
+  surface.setLocation(50, 50);
 }

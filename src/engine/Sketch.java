@@ -16,6 +16,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.ArcType;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -28,11 +29,13 @@ public class Sketch {
 
 	ArrayList<Double> verticesX;
 	ArrayList<Double> verticesY;
+	double shapeStartX;
+	double shapeStartY;
 	Color fillColor = Color.WHITE;
 	Color strokeColor = Color.BLACK;
 	boolean isFilled = true;
 	boolean isStroked = true;
-	short strokeWeightVal = 1;
+	float strokeWeightVal = 0.1f;
 	String fontName;
 	private float fontSizeVal = 11;
 	private Font currentFont = new Font(fontSizeVal);
@@ -44,9 +47,10 @@ public class Sketch {
 	double lastAngle = 0.0;
 
 	public float PI = (float) Math.PI;
-	public float HALF_PI = (float) PI / 2.0f;
-	public float TWO_PI = (float) 2 * PI;
-	public short width = 200, height = 200;
+	public float HALF_PI = (float) (Math.PI / 2.0);
+	public float TWO_PI = (float)(2 * Math.PI);
+	public float QUARTER_PI = (float) (Math.PI/4.0);
+	public short width = 200, height = 200,displayWidth, displayHeight;
 	public static final SETTINGS TOP = SETTINGS.TOP;
 	public static final SETTINGS BOTTOM = SETTINGS.BOTTOM;
 	public static final SETTINGS CENTER = SETTINGS.CENTER;
@@ -57,18 +61,21 @@ public class Sketch {
 	public static final SETTINGS RGB = SETTINGS.RGB;
 	public static final SETTINGS NEXT = SETTINGS.NEXT;
 	public static final SETTINGS BACK = SETTINGS.BACK;
+	public static final SETTINGS PIE = SETTINGS.PIE;
+	public static final SETTINGS CHORD = SETTINGS.CHORD;
+	public static final SETTINGS OPEN = SETTINGS.OPEN;
+	public static final SETTINGS CLOSE = SETTINGS.CLOSE;
 	public static final CURSOR ARROW = CURSOR.ARROW;
 	public static final CURSOR CROSS = CURSOR.CROSS;
 	public static final CURSOR HAND = CURSOR.HAND;
 	public static final CURSOR MOVE = CURSOR.MOVE;
 	public static final CURSOR TEXT = CURSOR.TEXT;
 	public static final CURSOR WAIT = CURSOR.WAIT;
-
+	private static final SETTINGS settingsVals[] = SETTINGS.values();
 	boolean isFullScreen = false;
 	boolean finished = false;
 
 	CURSOR cursor = ARROW;
-
 	SETTINGS ellipseModeVal = SETTINGS.CENTER;
 	SETTINGS rectModeVal = SETTINGS.CORNER;
 	boolean makingShape = false;
@@ -76,8 +83,10 @@ public class Sketch {
 	int textSizeVal = 15;
 	private SETTINGS textAligneValX = SETTINGS.LEFT;
 	private SETTINGS textAligneValY = SETTINGS.BOTTOM;
+	
 	SETTINGS colorModeVal = SETTINGS.RGB;
 	private double maxR = 255, maxG = 255, maxB = 255, maxA = 255;
+	
 	private SETTINGS imageModeVal = SETTINGS.CENTER;
 
 	private Stack<PenMatrix> matrtixStack = new Stack<PenMatrix>();
@@ -221,51 +230,45 @@ public class Sketch {
 		}
 	}
 
-	public Sketch() {
-	}
-
-	public void setup() {
-	}
-
-	public void draw() {
-	}
+	public Sketch() {}
 	
-	public void mousePressed() {
-	}
-
-	public void mouseReleased() {
-	}
-
-	public void mouseDragged() {
-	}
-
-	public void mouseMove() {
-	}
+	////////////////// Override //////////////////
 	
-	public void keyPressed() {
-	}
+	public void setup() {}
 
-	public void keyReleased() {
-	}
+	public void draw() {}
+
+	public void mousePressed() {}
+
+	public void mouseReleased() {}
+
+	public void mouseDragged() {}
+
+	public void mouseMove() {}
 	
-	public void keyTyped() {
-		
-	}
+	public void keyPressed() {}
 
+	public void keyReleased() {}
+	
+	public void keyTyped() {}
 
+	//////////////// Settings /////////////////////
+	
 	public final void size(int w, int h) {
-		width = (short) w;
-		can.setWidth(width);
+		surface.setSize(w, h);
+		can.setHeight(surface.h);
+		can.setWidth(surface.w);
 		if(maxWidth < w){
 			maxWidth = w;
 		}
-		height = (short) h;
-		can.setHeight(height);
+		width = (short)w;
+		height = (short)h;
 	}
 
 	public final void exit() {
 		finished = true;
 	}
+	
 	public final void exit(int error) {
 		finished = true;
 		Sketch.error = error;
@@ -424,11 +427,11 @@ public class Sketch {
 	}
 
 	public final float degrees(double angle) {
-		return (float) Math.toRadians(angle);
+		return (float) Math.toDegrees(angle);
 	}
 
 	public final float radians(double angle) {
-		return (float) Math.toDegrees(angle);
+		return (float) Math.toRadians(angle);
 	}
 
 	///////////// Random ///////////////////
@@ -746,6 +749,58 @@ public class Sketch {
 		pen.strokeLine(x1 + xOffset, y1 + yOffset, x2 + xOffset, y2 + yOffset);
 	}
 
+	public final void arc(double x1, double y1, double x2, double y2, double start, double stop) {
+		if(isFilled)
+			pen.fillArc(x1-(x2/2), y1-(y2/2), x2, y2, -degrees(start), -degrees(stop-start), ArcType.ROUND);
+		if(isStroked)
+			pen.strokeArc(x1-(x2/2), y1-(y2/2) , x2, y2, -degrees(start), -degrees(stop-start), ArcType.OPEN);
+	}
+		
+		 
+	
+	public final void arc(double x1, double y1, double x2, double y2, double start, double stop, int type) {
+		if(type > settingsVals.length)
+			arc(x1, y1, x2, y2, start, stop);
+		else
+			arc(x1, y1, x2, y2, start, stop, settingsVals[type]);
+	}
+	
+	public final void arc(double x1, double y1, double x2, double y2, double start, double stop, SETTINGS arcType) {
+		
+		
+		if(isFilled) {
+			switch(arcType) {
+				case OPEN:
+					pen.fillArc(x1-(x2/2), y1-(y2/2), x2, y2, -degrees(start), -degrees(stop-start), ArcType.OPEN);
+					break;
+				case CHORD:
+				case CLOSE:
+					pen.fillArc(x1-(x2/2), y1-(y2/2), x2, y2, -degrees(start), -degrees(stop-start), ArcType.CHORD);
+					break;
+				case PIE:
+				default:
+					pen.fillArc(x1-(x2/2), y1-(y2/2), x2, y2, -degrees(start), -degrees(stop-start), ArcType.ROUND);
+					break;
+			}
+		}
+		if(isStroked) {
+			switch(arcType) {
+				case PIE:
+					pen.strokeArc(x1-(x2/2), y1-(y2/2), x2, y2, -degrees(start), -degrees(stop-start), ArcType.ROUND);
+					break;
+				case CHORD:
+				case CLOSE:
+					pen.strokeArc(x1-(x2/2), y1-(y2/2), x2, y2, -degrees(start), -degrees(stop-start), ArcType.CHORD);
+					break;
+				default:
+				case OPEN:
+					pen.strokeArc(x1-(x2/2), y1-(y2/2), x2, y2, -degrees(start), -degrees(stop-start), ArcType.OPEN);
+					break;
+			}
+		}
+
+	}
+	
 	public final void ellipse(double x, double y, double w, double h) {
 		switch (ellipseModeVal) {
 		case CORNER:
@@ -768,7 +823,7 @@ public class Sketch {
 	}
 	
 	
-	public final void ellipse(double x, double y, double w) {
+	public final void circle(double x, double y, double w) {
 		switch (ellipseModeVal) {
 		case CORNER:
 			if (isFilled)
@@ -789,6 +844,11 @@ public class Sketch {
 		}
 	}
 
+	
+	public final void point(double x, double y) {
+		//pen.
+	}
+	
 	public final void rect(double x, double y, double w, double h) {
 		switch (rectModeVal) {
 		case CORNER:
@@ -822,28 +882,42 @@ public class Sketch {
 	}
 
 	public final void beginShape() {
-		makingShape = true;
-		verticesX = new ArrayList<Double>();
-		verticesY = new ArrayList<Double>();
+		//makingShape = true;
+		/*verticesX = new ArrayList<Double>();
+		verticesY = new ArrayList<Double>();*/
+		pen.beginPath();
 	}
 
-	public final void vextex(double x, double y) {
-		verticesX.add(x);
-		verticesY.add(y);
+	public final void vertex(double x, double y) {
+		/*verticesX.add(x);
+		verticesY.add(y);*/
+		if(makingShape)
+			pen.lineTo(x, y);
+		else {
+			pen.moveTo(x, y);
+			shapeStartX = x;
+			shapeStartY = y;
+		}
+		makingShape = true;
 	}
 
 	public final void endShape() {
-		int len = Math.min(verticesX.size(), verticesY.size());
+		/*int len = Math.min(verticesX.size(), verticesY.size());
 		double[] posX = new double[len], posY = new double[len];
 		for (int i = 0; i < len; ++i) {
 			posX[i] = verticesX.get(i);
 			posY[i] = verticesY.get(i);
-		}
+		}*/
+		
+		pen.lineTo(shapeStartX, shapeStartY);
 		if (isFilled)
-			pen.fillPolygon(posX, posY, len);
-		else
-			pen.strokePolygon(posX, posY, len);
+			//pen.fillPolygon(posX, posY, len);
+			pen.fill();
+		if(isStroked)
+			//pen.strokePolygon(posX, posY, len);
+			pen.stroke();
 		makingShape = false;
+		pen.closePath();
 	}
 
 	public final void pushMatrix() {
@@ -1065,7 +1139,6 @@ public class Sketch {
 
 	public final void image(Image img, double dx, double dy, double dw, double dh, double sx, double sy, double sw,
 			double sh) {
-
 		switch (imageModeVal) {
 		case CENTER:
 			pen.drawImage(img, sx, sy, sw, sh, dx - dw / 2, dy - dh / 2, dw, dh);

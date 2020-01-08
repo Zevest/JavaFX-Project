@@ -34,7 +34,7 @@ public class color{
 				(float) (a*maxA)
 			};
 		if(isHSB)
-			tmp.col = Color.hsb(r, g, b,a);
+			tmp.col = Color.hsb(r*360, g, b,a);
 		else
 			tmp.col = Color.color(r, g, b, a);
 		tmp.value = v;

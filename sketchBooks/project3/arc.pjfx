@@ -1,34 +1,81 @@
+float counter = 0;
+float counter2 = 0;
+float t = 62;
 public void setup(){
   size(500, 500);
   surface.setLocation(displayWidth/2-width/2, displayHeight/2 - height/2);
+  frameRate(t);
+  textAlign(CENTER,BOTTOM);
+  colorMode(HSB);
+  surface.setResizable(true);
 }
 
 public void draw(){
- // arc(200, 200, 400, 400, 0, PI+QUARTER_PI, CLOSE);
-	/*strokeWeight(0.1);
-	arc(100, 50, 80, 80, 0, PI+QUARTER_PI, OPEN);
-	arc(50, 100, 80, 80, 0, PI+QUARTER_PI, CHORD);
-	arc(100, 100, 80, 80, 0, PI+QUARTER_PI, PIE);
+	frameRate(t);
+	background(255);
+  //arc(200, 200, 400, 400, 0, PI+QUARTER_PI, CLOSE);
+	stroke(0);
+	fill(125);
+	//strokeWeight(0.1);
+	
+	float lx = width/8;
+	float ly = height/8;
+	float ls = min(lx, ly)*1.3f;
+	
+	arc(lx, ly, ls, ls, 0, PI+QUARTER_PI, OPEN);
+	arc(3*lx, ly, ls,ls, 0, PI+QUARTER_PI, CHORD);
+	arc(lx, 3*ly, ls, ls, 0, PI+QUARTER_PI, PIE);
+	arc(3*lx, 3*ly, ls, ls, 0, PI+QUARTER_PI);
+	
+	
+	float l = min(width, height);
+	
+	float size = (l/4-35)*sin(counter);
+	float sideCount = 8+5*cos(counter);
+	float angle = TWO_PI/50.0f*(counter);
+	
+	
+	fill(sin(counter*1.5)*128+128, 255, 255);
+	drawShape(width/4*3, height/5, size, sideCount,  angle);
+	
+	float size2 = (l/4-35)*sin(counter2);
+	float sideCount2 = 8+5*cos(counter2);
+	float angle2 = TWO_PI/50.0f*(counter2);
+	
+	fill(sin(counter2*1.5)*128+128, 255, 255);
+	drawShape(width/4*3, height/5*4, size2, sideCount2,  angle2);
 	
 	
 	
-	arc(50, 55, 50, 50, 0, HALF_PI);
-	noFill();
-	arc(50, 55, 60, 60, HALF_PI, PI);
-	arc(50, 55, 70, 70, PI, PI+QUARTER_PI);
-	arc(50, 55, 80, 80, PI+QUARTER_PI, TWO_PI);
 	
-	strokeWeight(0.1);
-	ellipse(200, 200, 100, 100);
-	line(0, 0, width, height);
-	rect(50, 55, 50, 50);
-	rect(50, 55, 60, 60);
-	rect(50, 55, 70, 70);
-	rect(50, 55, 80, 80);*/
-	//drawShape(width/2, height/2, 200, 4, QUARTER_PI);
-	drawShape(width/2, height/2, 200*sin(frameCount/500.0),8+5*cos(frameCount/200.0),  TWO_PI/50.0f*(frameCount/6.0f));
+	fill(0);
+	float x = width/2 + cos(counter - HALF_PI) * l/2;
+	float y = height/2 + sin(counter - HALF_PI) * l/2;
+	line(width/2, height/2, x, y);
+	float ball = min(width, height)*0.03f;
+	ellipse(x, y, ball, ball);
+	text("frameRateTarget " + t, width/2, height/2);
+	counter+= deltaTime;
+	counter2 += 0.01696;
 	
 }
+
+public void mousePressed() {
+	switch(mouseButton) {
+	case LEFT:
+		++t;
+		break;
+	case RIGHT:
+		--t;
+		break;
+	case CENTER:
+		t = 62;
+		break;
+	} 
+	if (t < 1)
+		t = 1;
+}
+
 void drawShape(float x, float y, float l, float n, float startAngle){
 	  //pushMatrix();
 	  //translate(x, y);
@@ -40,4 +87,4 @@ void drawShape(float x, float y, float l, float n, float startAngle){
 	  endShape();
 	  
 	  //popMatrix();
-	}
+}

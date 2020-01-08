@@ -29,8 +29,8 @@ public class Sketch {
 
 	ArrayList<Double> verticesX;
 	ArrayList<Double> verticesY;
-	double shapeStartX;
-	double shapeStartY;
+	//double shapeStartX;
+	//double shapeStartY;
 	Color fillColor = Color.WHITE;
 	Color strokeColor = Color.BLACK;
 	boolean isFilled = true;
@@ -489,7 +489,7 @@ public class Sketch {
 		case RGB:
 			return color.__color(false, nColor, nColor, nColor, 1.0, maxR, maxR, maxR, maxA);
 		case HSB:
-			return color.__color(true, nColor, nColor, nColor, 1.0, maxR, maxR, maxR, maxA);
+			return color.__color(true, nColor, 0, nColor, 1.0, maxR, maxR, maxR, maxA);
 		default:
 			return null;
 		}
@@ -503,7 +503,7 @@ public class Sketch {
 		case RGB:
 			return color.__color(false, nColor, nColor, nColor, alpha, maxR, maxR, maxR, maxA);
 		case HSB:
-			return color.__color(true, nColor, nColor, nColor, alpha, maxR, maxR, maxR, maxA);
+			return color.__color(true, nColor, 0, nColor, alpha, maxR, maxR, maxR, maxA);
 		default:
 			return null;
 		}
@@ -882,34 +882,39 @@ public class Sketch {
 	}
 
 	public final void beginShape() {
-		//makingShape = true;
-		/*verticesX = new ArrayList<Double>();
-		verticesY = new ArrayList<Double>();*/
-		pen.beginPath();
+		makingShape = true;
+		if(verticesX == null || verticesY == null) {
+			verticesX = new ArrayList<Double>();
+			verticesY = new ArrayList<Double>();
+		} else {
+			verticesX.clear();
+			verticesY.clear();
+		}
+		//
 	}
 
 	public final void vertex(double x, double y) {
-		/*verticesX.add(x);
-		verticesY.add(y);*/
-		if(makingShape)
+		verticesX.add(x);
+		verticesY.add(y);
+		/*if(makingShape)
 			pen.lineTo(x, y);
 		else {
 			pen.moveTo(x, y);
 			shapeStartX = x;
 			shapeStartY = y;
-		}
-		makingShape = true;
+		}*/
+		//makingShape = true;
 	}
 
 	public final void endShape() {
-		/*int len = Math.min(verticesX.size(), verticesY.size());
-		double[] posX = new double[len], posY = new double[len];
-		for (int i = 0; i < len; ++i) {
-			posX[i] = verticesX.get(i);
-			posY[i] = verticesY.get(i);
-		}*/
-		
-		pen.lineTo(shapeStartX, shapeStartY);
+		int len = Math.min(verticesX.size(), verticesY.size());
+		//double[] posX = new double[len], posY = new double[len];
+		pen.beginPath();
+		pen.moveTo(verticesX.get(0), verticesY.get(0));
+		for (int i = 1; i < len; ++i) {
+			pen.lineTo(verticesX.get(i), verticesY.get(i));
+		}
+		pen.lineTo(verticesX.get(0), verticesY.get(0));
 		if (isFilled)
 			//pen.fillPolygon(posX, posY, len);
 			pen.fill();

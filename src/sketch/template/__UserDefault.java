@@ -12,23 +12,7 @@ public class __UserDefault extends Sketch {
 float counter = 0;
 float counter2 = 0;
 float t = 62;
-public void setup(){
-  size(500, 500);
-  surface.setLocation(displayWidth/2-width/2, displayHeight/2 - height/2);
-  frameRate(t);
-  textAlign(CENTER,BOTTOM);
-  surface.setResizable(true);
-  background(255);
-}
 
-public void draw(){
-	
-	//drawBezierPoint();
-	drawTangent2();
-	//drawTangent2();
-	noLoop();
-	
-}
 
 public void mousePressed() {
 	switch(mouseButton) {
@@ -181,5 +165,69 @@ void drawTangent2() {
 	  a -= HALF_PI;
 	  line(x, y, cos(a)*8 + x, sin(a)*8 + y);
 	}
+}
+public void setup(){
+  size(500, 500);
+  surface.setLocation(displayWidth/2-width/2, displayHeight/2 - height/2);
+  frameRate(t);
+  textAlign(CENTER,BOTTOM);
+  surface.setResizable(true);
+  background(255);
+}
+
+public void draw(){
+	
+	
+	drawCurveTangent();
+	
+	noLoop();
+	
+}
+
+
+void drawCurveTangent() {
+	noFill();
+	curve(5, 26, 73, 24, 73, 61, 15, 65); 
+	int steps = 6;
+	for (int i = 0; i <= steps; i++) {
+	  float t = i / _float(steps);
+	  float x = curvePoint(5, 73, 73, 15, t);
+	  float y = curvePoint(26, 24, 61, 65, t);
+	  //ellipse(x, y, 5, 5);
+	  float tx = curveTangent(5, 73, 73, 15, t);
+	  float ty = curveTangent(26, 24, 61, 65, t);
+	  float a = atan2(ty, tx);
+	  println(tx, ty, a);
+	  a -= PI/2.0;
+	  line(x, y, cos(a)*8 + x, sin(a)*8 + y);
+	}
+}
+
+void drawCurvePoint() {
+	noFill();
+	curve(5, 26, 5, 26, 73, 24, 73, 61);
+	curve(5, 26, 73, 24, 73, 61, 15, 65);
+	fill(255);
+	ellipseMode(CENTER);
+	int steps = 6;
+	for (int i = 0; i <= steps; i++) {
+	  float t = i / _float(steps);
+	  float x = curvePoint(5, 5, 73, 73, t);
+	  float y = curvePoint(26, 26, 24, 61, t);
+	  ellipse(x, y, 5, 5);
+	  x = curvePoint(5, 73, 73, 15, t);
+	  y = curvePoint(26, 24, 61, 65, t);
+	  ellipse(x, y, 5, 5);
+	}
+}
+
+void drawCurve() {
+	noFill();
+	stroke(255, 102, 0);
+	curve(5, 26, 5, 26, 73, 24, 73, 61);
+	stroke(0); 
+	curve(5, 26, 73, 24, 73, 61, 15, 65); 
+	stroke(255, 102, 0);
+	curve(73, 24, 73, 61, 15, 65, 15, 65);
 }
 }

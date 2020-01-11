@@ -109,7 +109,7 @@ public class Sketch {
 	public KeyCode keyCode;
 	public final String CODED = "CODED";
 	
-	int beizerPointVal = 20;
+	private int beizerPointVal = 20, curvePointVal = 20;
 	
 	PixelReader px;
 	PixelWriter pw;
@@ -120,6 +120,8 @@ public class Sketch {
 	String sketchName = "sketch";
 	public Surface surface = new Surface(sketchName);
 	// BufferedImage test;
+	private double curveTightnessVal;
+	
 
 	static int error = 0;
 	
@@ -815,13 +817,12 @@ public class Sketch {
 	
 	public final float bezierTangent(double a, double b, double c,double d,  double t){
 		return (float) (3 * sq(1-t) * (b-a) + 6 * (1-t)*t*(c-b)+3*sq(t)*(d-c));
-		
 	}
 	
 	public final void bezier(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
 		double x, y, step = 1.0/beizerPointVal;
 		pen.beginPath();
-		
+		pen.moveTo(x1, y1);
 		for(double t = 0; t < 1.0001; t+= step) {
 			x = bezierPoint(x1, x2, x3, x4, t);
 			y = bezierPoint(y1, y2, y3, y4, t);
@@ -830,6 +831,46 @@ public class Sketch {
 		pen.lineTo(x4, y4);
 		pen.stroke();
 		
+	}
+	
+	public final void curveDetail(int detail) {
+		curvePointVal = detail;
+	}
+	
+	public final void curveTightness(double tightness) {
+		curveTightnessVal = tightness;
+	}
+	
+	public final float curvePoint(double a, double b, double c, double d, double t) {
+		return  0.5f * (float) (
+					(2 * b) +
+					(-a + c) * t +
+					(2 * a - 5 * b + 4 * c - d) * sq(t) +
+					(-a + 3 * b - 3 * c + d) * pow(t, 3)
+				);
+				
+	}
+	
+	public final float curveTangent(double a, double b, double c,double d,  double t) {
+		return 0.5f * (float) (
+				(-a + c) +
+				2*(2 * a - 5 * b + 4 * c - d) * t +
+				3*(-a + 3 * b - 3 * c + d) * sq(t)
+			);
+		
+	}
+	
+	public final void curve(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
+		double x, y, step = 1.0/curvePointVal;
+		pen.beginPath();
+		pen.moveTo(x2, y2);
+		for(double t = 0; t < 1.0001; t+= step) {
+			x = curvePoint(x1, x2, x3, x4, t);
+			y = curvePoint(y1, y2, y3, y4, t);
+			pen.lineTo(x, y);
+		}
+		pen.lineTo(x3, y3);
+		pen.stroke();
 	}
 	
 	

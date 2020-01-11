@@ -1,23 +1,7 @@
 float counter = 0;
 float counter2 = 0;
 float t = 62;
-public void setup(){
-  size(500, 500);
-  surface.setLocation(displayWidth/2-width/2, displayHeight/2 - height/2);
-  frameRate(t);
-  textAlign(CENTER,BOTTOM);
-  surface.setResizable(true);
-  background(255);
-}
 
-public void draw(){
-	
-	//drawBezierPoint();
-	drawTangent2();
-	//drawTangent2();
-	noLoop();
-	
-}
 
 public void mousePressed() {
 	switch(mouseButton) {

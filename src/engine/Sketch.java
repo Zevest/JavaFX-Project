@@ -120,7 +120,7 @@ public class Sketch {
 	String sketchName = "sketch";
 	public Surface surface = new Surface(sketchName);
 	// BufferedImage test;
-	private double curveTightnessVal;
+	
 	
 
 	static int error = 0;
@@ -174,6 +174,20 @@ public class Sketch {
 		maxYChange = 0;
 	}
 
+	private final void exitWithError(String message, int stackOffset) {
+		StackTraceElement[] temp = Thread.getAllStackTraces().get(Thread.currentThread());
+		StackTraceElement e = temp[stackOffset];
+		StackTraceElement e2 = temp[stackOffset+1];
+		System.err.println(message);
+		System.err.printf("Error %s in methods %s\n",e.getMethodName(), e2.getMethodName());
+		
+		for(int i = 4; i < temp.length; ++i) {
+			System.err.println(temp[i].toString());
+		}
+		
+		exit(-1);
+	}
+	
 	public final color getPixels(int x, int y) {
 		if(Ppixels == null) {
 			System.err.println("Error: Pixel Array is empty");
@@ -189,6 +203,7 @@ public class Sketch {
 			}
 			
 			exit(-1);
+			exitWithError(String.format("Coordinates (%d, %d) out of range(%d, %d)\\n",x, y, width, height), 3);
 		}
 		return color(Ppixels[y *maxWidth + x]);
 	}
@@ -714,6 +729,13 @@ public class Sketch {
 	public final void colorMode(SETTINGS mode) {
 		colorModeVal = mode;
 	}
+	public final void colorMode(int mode) {
+		if(mode < settingsVals.length)
+			colorModeVal = settingsVals[mode];
+		else
+			exitWithError("Undefined colorMode mode " + mode, 3);
+		
+	}
 
 	public final void colorMode(SETTINGS mode, double maxV) {
 		this.maxR = maxV;
@@ -721,6 +743,14 @@ public class Sketch {
 		this.maxB = maxV;
 		this.maxA = maxV;
 		colorModeVal = mode;
+	}
+	
+	public final void colorMode(int mode, double maxV) {
+		if(mode < settingsVals.length)
+			colorMode(settingsVals[mode], maxV);
+		else
+			exitWithError("Undefined colorMode mode " + mode, 3);
+		
 	}
 
 	public final void colorMode(SETTINGS mode, double maxR, double maxG, double maxB) {
@@ -730,6 +760,14 @@ public class Sketch {
 		colorModeVal = mode;
 	}
 
+	public final void colorMode(int mode, double maxR, double maxG, double maxB) {
+		if(mode < settingsVals.length)
+			colorMode(settingsVals[mode], maxR, maxG, maxB);
+		else
+			exitWithError("Undefined colorMode mode " + mode, 3);
+		
+	}
+	
 	public final void colorMode(SETTINGS mode, double maxR, double maxG, double maxB, double maxA) {
 		this.maxR = maxR;
 		this.maxG = maxG;
@@ -737,18 +775,45 @@ public class Sketch {
 		this.maxA = maxA;
 		colorModeVal = mode;
 	}
+	public final void colorMode(int mode, double maxR, double maxG, double maxB, double maxA) {
+		if(mode < settingsVals.length)
+			colorMode(settingsVals[mode], maxR, maxG, maxB, maxA);
+		else
+			exitWithError("Undefined colorMode mode " + mode, 3);
+		
+	}
+	
 
 	public final void ellipseMode(SETTINGS mode) {
 		ellipseModeVal = mode;
+	}
+	public final void ellipseMode(int mode) {
+		if(mode < settingsVals.length)
+			ellipseModeVal = settingsVals[mode];
+		else
+			exitWithError("Undefined ellipse mode " + mode, 3);
+		
 	}
 
 	public final void rectMode(SETTINGS mode) {
 		rectModeVal = mode;
 	}
+	public final void rectMode(int mode) {
+		if(mode < settingsVals.length)
+			rectModeVal = settingsVals[mode];
+		else
+			exitWithError("Undefined rect mode " + mode, 3);
+		
+	}
 
 	public final void imageMode(SETTINGS mode) {
 		imageModeVal = mode;
 	}
+	
+	public final void imageMode(int mode) {
+		imageModeVal = settingsVals[mode];
+	}
+
 
 	public final void line(double x1, double y1, double x2, double y2) {
 		pen.strokeLine(x1 + xOffset, y1 + yOffset, x2 + xOffset, y2 + yOffset);
@@ -836,10 +901,7 @@ public class Sketch {
 	public final void curveDetail(int detail) {
 		curvePointVal = detail;
 	}
-	
-	public final void curveTightness(double tightness) {
-		curveTightnessVal = tightness;
-	}
+
 	
 	public final float curvePoint(double a, double b, double c, double d, double t) {
 		return  0.5f * (float) (
@@ -848,6 +910,7 @@ public class Sketch {
 					(2 * a - 5 * b + 4 * c - d) * sq(t) +
 					(-a + 3 * b - 3 * c + d) * pow(t, 3)
 				);
+
 				
 	}
 	
@@ -857,6 +920,8 @@ public class Sketch {
 				2*(2 * a - 5 * b + 4 * c - d) * t +
 				3*(-a + 3 * b - 3 * c + d) * sq(t)
 			);
+
+				
 		
 	}
 	
@@ -981,24 +1046,67 @@ public class Sketch {
 		}*/
 		//makingShape = true;
 	}
+	
+	public final void bezierVertex(double x2, double y2, double x3, double y3, double x4, double y4) {
+		double x1 = verticesX.get(verticesX.size()-1);
+		double y1 = verticesY.get(verticesY.size()-1);
+		double x, y, step = 1.0/beizerPointVal;
+		for(double t = 0; t < 1.0001; t+= step) {
+			x = bezierPoint(x1, x2, x3, x4, t);
+			y = bezierPoint(y1, y2, y3, y4, t);
+			verticesX.add(x);
+			verticesY.add(y);
+		}
+		verticesX.add(x4);
+		verticesY.add(y4);
+	}
 
+	/*public final void curveVertex(double x, double y) {
+		double x, y, step = 1.0/curvePointVal;
+		pen.beginPath();
+		pen.moveTo(x2, y2);
+		for(double t = 0; t < 1.0001; t+= step) {
+			x = curvePoint(x1, x2, x3, x4, t);
+			y = curvePoint(y1, y2, y3, y4, t);
+			pen.lineTo(x, y);
+		}
+		pen.lineTo(x3, y3);
+		pen.stroke();
+	}*/
+	
 	public final void endShape() {
+		endShape(SETTINGS.OPEN); 
+	}
+	
+	public final void endShape(int mode) {
+		if(mode < settingsVals.length)
+			endShape(settingsVals[mode]);
+		else
+			exitWithError("Undefined Shape mode " + mode, 3);
+		
+	}
+	
+	public final void endShape(SETTINGS mode) {
 		int len = Math.min(verticesX.size(), verticesY.size());
-		//double[] posX = new double[len], posY = new double[len];
 		pen.beginPath();
 		pen.moveTo(verticesX.get(0), verticesY.get(0));
 		for (int i = 1; i < len; ++i) {
 			pen.lineTo(verticesX.get(i), verticesY.get(i));
 		}
-		pen.lineTo(verticesX.get(0), verticesY.get(0));
+		switch(mode) {
+		case CLOSE:
+			pen.closePath();
+			break;
+		case OPEN:
+		default:
+			break;
+		}
+		
 		if (isFilled)
-			//pen.fillPolygon(posX, posY, len);
 			pen.fill();
 		if(isStroked)
-			//pen.strokePolygon(posX, posY, len);
 			pen.stroke();
 		makingShape = false;
-		pen.closePath();
 	}
 
 	

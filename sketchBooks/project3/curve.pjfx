@@ -6,16 +6,22 @@ public void setup(){
   surface.setResizable(true);
   background(255);
 }
+float y = -5.0f;
 
 public void draw(){
-	
-	
-	drawCurveTangent();
-	
-	noLoop();
+	background(255);
+	shapeCurve();
+	//noLoop();
 	
 }
 
+void shapeCurve() {
+	noFill();
+	beginShape();
+	vertex(30, 20);
+	bezierVertex(80, 0, 80, 75, 30, 75);
+	endShape();
+}
 
 void drawCurveTangent() {
 	noFill();
@@ -29,7 +35,6 @@ void drawCurveTangent() {
 	  float tx = curveTangent(5, 73, 73, 15, t);
 	  float ty = curveTangent(26, 24, 61, 65, t);
 	  float a = atan2(ty, tx);
-	  println(tx, ty, a);
 	  a -= PI/2.0;
 	  line(x, y, cos(a)*8 + x, sin(a)*8 + y);
 	}

@@ -133,11 +133,11 @@ public class PreCompiler {
 	}
 
 	public void buildHeader() {
-		fileContent += pakageName + ";\n";
+		fileContent += pakageName + ";";
 		for (String importLine : importation) {
-			fileContent += importLine + ";\n";
+			fileContent += importLine + ";";
 		}
-		fileContent += classScope + " " + className + " " + classExtension + " {\n";
+		fileContent += classScope + " " + className + " " + classExtension + " {";
 	}
 
 	public void saveFile() {

@@ -1,15 +1,4 @@
-package sketch.template;
-import constant.CURSOR;
-import constant.SETTINGS;
-import util.PVector;
-import util.color;
-import engine.Sketch;
-import java.util.ArrayList;
-import javafx.scene.image.Image;
-import java.util.HashMap;
-import javafx.scene.input.KeyCode;
-public class __UserDefault extends Sketch {
-float counter = 0;
+package sketch.template;import constant.CURSOR;import constant.SETTINGS;import util.PVector;import util.color;import util.PShape;import engine.Sketch;import java.util.ArrayList;import javafx.scene.image.Image;import java.util.HashMap;import javafx.scene.input.KeyCode;import java.io.BufferedReader;public class __UserDefault extends Sketch {float counter = 0;
 float counter2 = 0;
 float t = 62;
 
@@ -174,16 +163,22 @@ public void setup(){
   surface.setResizable(true);
   background(255);
 }
+float y = -5.0f;
 
 public void draw(){
-	
-	
-	drawCurveTangent();
-	
-	noLoop();
+	background(255);
+	shapeCurve();
+	//noLoop();
 	
 }
 
+void shapeCurve() {
+	noFill();
+	beginShape();
+	vertex(30, 20);
+	bezierVertex(80, 0, 80, 75, 30, 75);
+	endShape();
+}
 
 void drawCurveTangent() {
 	noFill();
@@ -197,7 +192,6 @@ void drawCurveTangent() {
 	  float tx = curveTangent(5, 73, 73, 15, t);
 	  float ty = curveTangent(26, 24, 61, 65, t);
 	  float a = atan2(ty, tx);
-	  println(tx, ty, a);
 	  a -= PI/2.0;
 	  line(x, y, cos(a)*8 + x, sin(a)*8 + y);
 	}

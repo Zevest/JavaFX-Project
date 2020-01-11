@@ -173,7 +173,7 @@ public class Main {
 		String finalCommand = "";
 		for(int i = 0; i < command.length; ++i) {
 			finalCommand += command[i] + " ";
-		}
+		}	
 		
 		Process pro = Runtime.getRuntime().exec(finalCommand, null, new File(dir));
 		processList[pid++] = pro;

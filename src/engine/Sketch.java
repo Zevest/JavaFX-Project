@@ -1,5 +1,6 @@
 package engine;
 
+import java.io.BufferedReader;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Stack;
@@ -20,10 +21,8 @@ import javafx.scene.shape.ArcType;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import util.FileManager;
-import util.Noise;
-import util.Util;
-import util.color;
+import util.*;
+
 
 public class Sketch {
 
@@ -74,6 +73,7 @@ public class Sketch {
 	private static final SETTINGS settingsVals[] = SETTINGS.values();
 	boolean isFullScreen = false;
 	boolean finished = false;
+	
 
 	CURSOR cursor = ARROW;
 	SETTINGS ellipseModeVal = SETTINGS.CENTER;
@@ -108,6 +108,9 @@ public class Sketch {
 	public String key;
 	public KeyCode keyCode;
 	public final String CODED = "CODED";
+	
+	int beizerPointVal = 20;
+	
 	PixelReader px;
 	PixelWriter pw;
 	public int minXChange = 0, minYChange = 0, maxXChange = width, maxYChange = height;
@@ -801,6 +804,36 @@ public class Sketch {
 
 	}
 	
+	
+	public final void beizerDetail(int detail) {
+		beizerPointVal = detail;
+	}
+	
+	public final float bezierPoint(double a, double b, double c, double d, double t) {
+		return  (float)(pow(1- t, 3)*a + 3 * sq(1 - t) * t * b + 3*(1-t)*sq(t)*c+pow(t,3)*d);
+	}
+	
+	public final float bezierTangent(double a, double b, double c,double d,  double t){
+		return (float) (3 * sq(1-t) * (b-a) + 6 * (1-t)*t*(c-b)+3*sq(t)*(d-c));
+		
+	}
+	
+	public final void bezier(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
+		double x, y, step = 1.0/beizerPointVal;
+		pen.beginPath();
+		
+		for(double t = 0; t < 1.0001; t+= step) {
+			x = bezierPoint(x1, x2, x3, x4, t);
+			y = bezierPoint(y1, y2, y3, y4, t);
+			pen.lineTo(x, y);
+		}
+		pen.lineTo(x4, y4);
+		pen.stroke();
+		
+	}
+	
+	
+	
 	public final void ellipse(double x, double y, double w, double h) {
 		switch (ellipseModeVal) {
 		case CORNER:
@@ -848,6 +881,8 @@ public class Sketch {
 	public final void point(double x, double y) {
 		//pen.
 	}
+	
+	
 	
 	public final void rect(double x, double y, double w, double h) {
 		switch (rectModeVal) {
@@ -925,6 +960,7 @@ public class Sketch {
 		pen.closePath();
 	}
 
+	
 	public final void pushMatrix() {
 		pen.save();
 		matrtixStack.push(new PenMatrix(this));
@@ -1156,6 +1192,10 @@ public class Sketch {
 		}
 	}
 
+	public final BufferedReader createReader(String fileName) {
+		return FileManager.createReader(fileName);
+	}
+	
 	public final void cursor() {
 		cursor = ARROW;
 	}

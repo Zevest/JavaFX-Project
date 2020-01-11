@@ -28,6 +28,17 @@ public final class FileManager {
 		return Paths.get(first, other).toString();
 	}
 	
+	public static BufferedReader createReader(String fileName) {
+		Path path = Paths.get(System.getProperty("user.dir"), dataFolderPath, fileName);
+		BufferedReader br;
+		try {
+			br = Files.newBufferedReader(path);
+        } catch (IOException e) {
+            System.err.format("IOException: %s%n", e);
+            return null;
+        }
+		return br;
+	}
 	
 	public static String getFolderPath() {
 		return Paths.get(System.getProperty("user.dir"), dataFolderPath).toString();

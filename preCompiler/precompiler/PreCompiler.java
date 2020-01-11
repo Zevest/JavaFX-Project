@@ -5,11 +5,18 @@ import precompiler.TinyFileManager;
 
 public class PreCompiler {
 	String pakageName = "package sketch.template";
-	String[] importation = { "import constant.CURSOR", "import constant.SETTINGS", "import util.PVector",
-			"import util.color", "import engine.Sketch", "import java.util.ArrayList",
+	String[] importation = { 
+			"import constant.CURSOR",
+			"import constant.SETTINGS",
+			"import util.PVector",
+			"import util.color",
+			"import util.PShape",
+			"import engine.Sketch",
+			"import java.util.ArrayList",
 			"import javafx.scene.image.Image",
 			"import java.util.HashMap",
-			"import javafx.scene.input.KeyCode"
+			"import javafx.scene.input.KeyCode",
+			"import java.io.BufferedReader",
 	};
 	String className = "__UserDefault";
 	String sketchFileName;

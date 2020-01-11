@@ -22,11 +22,10 @@ public final class TinyFileManager {
 		}
 		return null;
 	}
-		
+	
 	public static String getTextFileData(String fileName, String path) {
 		StringBuilder sb = new StringBuilder();
 		try (BufferedReader br = Files.newBufferedReader(Paths.get(path, fileName), Charset.forName("ISO-8859-1"))) {
-
             // read line by line
             String line;
             while ((line = br.readLine()) != null) {

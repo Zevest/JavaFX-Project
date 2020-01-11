@@ -29,7 +29,7 @@ public class Util {
 	}
 	
 	public static double lerp(double start, double end, double amt) {
-		return (end-start) * amt;
+		return start + (end-start) * amt;
 	}
 	
 	public static final double random() {

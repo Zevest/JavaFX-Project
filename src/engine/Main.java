@@ -47,7 +47,7 @@ public class Main {
         });
 		
         String projectPath = Paths.get(System.getProperty("user.dir"),"sketchBooks").toString();//"C:\\dev\\pjfx";//
-        String projectName = "project3";//"Test";
+        String projectName = "Clock";//"Test";
         
 		String file = Paths.get("sketch", "template", "__UserDefault.java").toString();
 		String engine = "";//Paths.get("engine", "COre.java").toString();

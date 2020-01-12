@@ -3,6 +3,7 @@ package engine;
 import java.io.BufferedReader;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Stack;
 
 import constant.CURSOR;
@@ -38,16 +39,18 @@ public class Sketch {
 	String fontName;
 	private float fontSizeVal = 11;
 	private Font currentFont = new Font(fontSizeVal);
-
+	private long startTime = System.currentTimeMillis();
 	double xOffset = 0.0;
 	double yOffset = 0.0;
 	double xScale = 1.0;
 	double yScale = 1.0;
 	double lastAngle = 0.0;
-
+	
+	
 	public float PI = (float) Math.PI;
 	public float HALF_PI = (float) (Math.PI / 2.0);
 	public float TWO_PI = (float)(2 * Math.PI);
+	public float TAU = (float) (2 * Math.PI);
 	public float QUARTER_PI = (float) (Math.PI/4.0);
 	public short width = 200, height = 200,displayWidth, displayHeight;
 	public static final SETTINGS TOP = SETTINGS.TOP;
@@ -105,6 +108,8 @@ public class Sketch {
 	public float mouseX = FileManager.init();
 	public float mouseY = 0;
 	public SETTINGS mouseButton = SETTINGS.NONE;
+	public boolean mousePressed;
+	public boolean keyPressed;
 	public String key;
 	public KeyCode keyCode;
 	public final String CODED = "CODED";
@@ -115,48 +120,30 @@ public class Sketch {
 	PixelWriter pw;
 	public int minXChange = 0, minYChange = 0, maxXChange = width, maxYChange = height;
 	int maxWidth;
-	public color[] pixels;
-	int[] Ppixels;
+	int[] pixels;
 	String sketchName = "sketch";
 	public Surface surface = new Surface(sketchName);
 	// BufferedImage test;
+	private boolean loaded;
+	private boolean changedPixel;
 	
 	
 
 	static int error = 0;
 	
-	public final void loadPixels() {
-		WritableImage tmp = can.snapshot(null, null);
-		px = tmp.getPixelReader();
-		px.getPixels(0, 0, width, height, PixelFormat.getIntArgbInstance(), Ppixels, /*(int)abs((windowSizeY-height) * width)*/0 , maxWidth);
-		
-		for (int j = 0; j < height; ++j) {
-			for (int i = 0; i < width; ++i) {
-				pixels[j * (width) + i] = color(px.getArgb(i, j));
-			}
-		}
-	}
 
-	public final void updatePixels() {
-		pw = pen.getPixelWriter();
-		for (int j = 0; j < height; ++j) {
-			for (int i = 0; i < width; ++i) {
-				int index = (int) min(j * width + i, pixels.length);
-				pw.setArgb(i, j, pixels[index].getArgb());
-			}
-		}
-	}
 
-	public final void loadFastPixels() {
-		if(Ppixels == null || Ppixels.length < maxWidth*height)
-			Ppixels = new int[maxWidth * height];
+	private final void loadPixels() {
+		if(pixels == null || pixels.length < maxWidth*height)
+			pixels = new int[maxWidth * height];
 		WritableImage tmp = can.snapshot(null, null);
 		px = tmp.getPixelReader();
 		WritablePixelFormat<IntBuffer> format= PixelFormat.getIntArgbInstance();
-		px.getPixels(0, 0, width, height, format, Ppixels,  0, maxWidth);
+		px.getPixels(0, 0, width, height, format, pixels,  0, maxWidth);
+		loaded = true;
 	}
 
-	public final void updateFastPixels() {
+	final void updatePixels() {
 		int offset = constrain(minYChange, 0, height) * maxWidth + constrain(minXChange, 0, width);
 		pw = pen.getPixelWriter();
 		WritablePixelFormat<IntBuffer> format= PixelFormat.getIntArgbInstance();
@@ -165,7 +152,7 @@ public class Sketch {
 				constrain(minYChange, 0, height),
 				constrain(maxXChange - minXChange, 1, width), 
 				constrain(maxYChange - minYChange, 1, height),
-				format, Ppixels, offset, maxWidth
+				format, pixels, offset, maxWidth
 				);
 		
 		minXChange = width;
@@ -188,11 +175,28 @@ public class Sketch {
 		exit(-1);
 	}
 	
-	public final color getPixels(int x, int y) {
-		if(Ppixels == null) {
-			System.err.println("Error: Pixel Array is empty");
-			System.err.println("You must use the loadFastPixel function First Before trying accessing the pixel");
-			exit(-1);
+	final void resetPixelsFlags() {
+		changedPixel = false;
+		loaded = false;
+	}
+	
+	final boolean getChangedPixel() {
+		return changedPixel;
+	}
+	
+	final boolean getLoaded() {
+		return loaded;
+	}
+	
+	
+	
+	public final color get(int x, int y) {
+		if(pixels == null || !loaded) {
+			//System.err.println("Error: Pixel Array is empty");
+			//System.err.println("You must use the loadFastPixel function First Before trying accessing the pixel");
+			//exit(-1);
+			loadPixels();
+			loaded = true;
 		}
 		if(y < 0 || y >= height || x < 0 || x >= width) {
 			StackTraceElement[] temp = Thread.getAllStackTraces().get(Thread.currentThread());
@@ -205,14 +209,59 @@ public class Sketch {
 			exit(-1);
 			exitWithError(String.format("Coordinates (%d, %d) out of range(%d, %d)\\n",x, y, width, height), 3);
 		}
-		return color(Ppixels[y *maxWidth + x]);
+		return color(pixels[y *maxWidth + x]);
 	}
 	
-	public final void putPixels(int x, int y, color col) {
-		if(Ppixels == null) {
-			System.err.println("Error: Pixel Array is empty");
-			System.err.println("You must use the loadFastPixel function First Before trying accessing the pixel");
-			System.exit(-1);
+	public final void delay(int time) {
+		long startedTime = System.currentTimeMillis(), currentTime;
+		do {
+			currentTime = System.currentTimeMillis();
+		}
+		while( currentTime - startedTime < time);
+			
+	}
+	
+	public final int millis() {
+		return (int) (System.currentTimeMillis() - startTime); 
+	}
+	
+	public final int second() {
+		return (int) (System.currentTimeMillis()/1000)%60;
+	}
+	
+	public final int minute() {
+		return (int) (System.currentTimeMillis()/1000/60)%60;
+	}
+	
+	public final int hour() {
+		Calendar cal = Calendar.getInstance();
+		int offset = cal.getTimeZone().getDSTSavings();
+		return (int) ((System.currentTimeMillis()+offset)/1000/60/60)%24;
+	}
+	
+	public final int day() {
+		Calendar cal = Calendar.getInstance();
+		return cal.get(Calendar.DAY_OF_MONTH);
+	}
+	
+	public final int month() {
+		Calendar cal = Calendar.getInstance();
+		return cal.get(Calendar.MONTH+1);
+	}
+	
+	public final int year() {
+		Calendar cal = Calendar.getInstance();
+		return cal.get(Calendar.YEAR);
+	}
+	
+	
+	
+	public final void set(int x, int y, color col) {
+		if(pixels == null || pixels.length < maxWidth*height ||  !loaded) {
+			loadPixels();
+			//System.err.println("Error: Pixel Array is empty");
+			//System.err.println("You must use the loadFastPixel function First Before trying accessing the pixel");
+			//System.exit(-1);
 			return;
 		}
 
@@ -243,7 +292,8 @@ public class Sketch {
 		}
 		
 		try {
-			Ppixels[y * maxWidth + x] = col.getArgb();
+			pixels[y * maxWidth + x] = col.getArgb();
+			changedPixel = true;
 		} catch(ArrayIndexOutOfBoundsException e) {
 			e.printStackTrace();
 			exit(-1);

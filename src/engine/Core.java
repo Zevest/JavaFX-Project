@@ -77,6 +77,12 @@ public class Core extends Application {
     	if(sketch.isLoop || redraw) {
     		sketch.pushMatrix();
     		sketch.draw();
+    		if(sketch.getChangedPixel()) {
+    			sketch.updatePixels();
+    			sketch.resetPixelsFlags();
+    		}else if(sketch.getLoaded()) {
+    			sketch.resetPixelsFlags();
+    		}
     		sketch.popMatrix();
     		redraw = false;
     	}
@@ -186,7 +192,7 @@ public class Core extends Application {
     	        	break;
     	        }
     	        
-    	        
+    	        sketch.mousePressed = true;
     	    	sketch.mousePressed();
     	    	//sketch.mousePressed(mouseEvent)
     	    }
@@ -195,7 +201,7 @@ public class Core extends Application {
     	scene.addEventHandler(MouseEvent.MOUSE_RELEASED  , new EventHandler<MouseEvent>() {
     	    @Override
     	    public void handle(MouseEvent mouseEvent) {
-    	    	
+    	    	sketch.mousePressed = false;
     	    	sketch.mouseReleased();
     	    	//sketch.mouseReleased(mouseEvent);
     	    	sketch.mouseButton = SETTINGS.NONE;
@@ -235,6 +241,7 @@ public class Core extends Application {
 				String tmp = event.getText();
 				sketch.key = tmp.length() > 0 ? tmp : "CODED";
 				sketch.keyCode = event.getCode();
+				 sketch.keyPressed = true;
 				sketch.keyPressed();
 				//sketch.keyPressed(event);
 			}
@@ -250,6 +257,7 @@ public class Core extends Application {
 				String tmp = event.getText();
 				sketch.key = tmp.length() > 0 ? tmp : "CODED";
 				sketch.keyCode = event.getCode();
+				sketch.keyPressed = false;
 				sketch.keyReleased();
 				//sketch.keyReleased(event);
 				//set KeyPressed to 0

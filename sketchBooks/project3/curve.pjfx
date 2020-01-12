@@ -1,16 +1,25 @@
 public void setup(){
-  size(500, 500);
+  size(200, 200);
   surface.setLocation(displayWidth/2-width/2, displayHeight/2 - height/2);
   frameRate(t);
   textAlign(CENTER,BOTTOM);
   surface.setResizable(true);
   background(255);
+  colorMode(HSB);
 }
 float y = -5.0f;
 
 public void draw(){
 	background(255);
-	shapeCurve();
+	//shapeCurve();
+	//drawCurveTangent();
+	//drawCurvePoint();
+	//drawTangent2();
+	//drawTangent1();
+	/*drawCurve1(width/4, 0);
+	drawCurve2(width/2, 0);
+	drawBezierPoint();*/
+	drawStuff();
 	//noLoop();
 	
 }

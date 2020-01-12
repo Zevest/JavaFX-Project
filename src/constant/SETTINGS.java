@@ -15,7 +15,10 @@ public enum SETTINGS {
 	PIE(11),
 	CHORD(12),
 	OPEN(13),
-	CLOSE(14);
+	CLOSE(14),
+	PROJECT(15),
+	ROUND(16),
+	SQUARE(17);
 	
 	
 	private int action;

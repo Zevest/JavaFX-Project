@@ -22,6 +22,7 @@ import javafx.scene.shape.ArcType;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.shape.StrokeLineCap;
 import util.*;
 
 
@@ -67,12 +68,16 @@ public class Sketch {
 	public static final SETTINGS CHORD = SETTINGS.CHORD;
 	public static final SETTINGS OPEN = SETTINGS.OPEN;
 	public static final SETTINGS CLOSE = SETTINGS.CLOSE;
+	public static final SETTINGS PROJECT = SETTINGS.PROJECT;
+	public static final SETTINGS SQUARE = SETTINGS.SQUARE;
+	public static final SETTINGS ROUND = SETTINGS.ROUND;
 	public static final CURSOR ARROW = CURSOR.ARROW;
 	public static final CURSOR CROSS = CURSOR.CROSS;
 	public static final CURSOR HAND = CURSOR.HAND;
 	public static final CURSOR MOVE = CURSOR.MOVE;
 	public static final CURSOR TEXT = CURSOR.TEXT;
 	public static final CURSOR WAIT = CURSOR.WAIT;
+	
 	private static final SETTINGS settingsVals[] = SETTINGS.values();
 	boolean isFullScreen = false;
 	boolean finished = false;
@@ -81,6 +86,7 @@ public class Sketch {
 	CURSOR cursor = ARROW;
 	SETTINGS ellipseModeVal = SETTINGS.CENTER;
 	SETTINGS rectModeVal = SETTINGS.CORNER;
+	SETTINGS strokeCapVal = SETTINGS.ROUND;
 	boolean makingShape = false;
 
 	int textSizeVal = 15;
@@ -780,10 +786,10 @@ public class Sketch {
 		colorModeVal = mode;
 	}
 	public final void colorMode(int mode) {
-		if(mode < settingsVals.length)
+		if(mode >= 0 && mode < settingsVals.length)
 			colorModeVal = settingsVals[mode];
 		else
-			exitWithError("Undefined colorMode mode " + mode, 3);
+			colorModeVal = SETTINGS.RGB;
 		
 	}
 
@@ -796,10 +802,10 @@ public class Sketch {
 	}
 	
 	public final void colorMode(int mode, double maxV) {
-		if(mode < settingsVals.length)
+		if(mode >= 0 && mode < settingsVals.length)
 			colorMode(settingsVals[mode], maxV);
 		else
-			exitWithError("Undefined colorMode mode " + mode, 3);
+			colorMode(SETTINGS.RGB, maxV);
 		
 	}
 
@@ -811,10 +817,10 @@ public class Sketch {
 	}
 
 	public final void colorMode(int mode, double maxR, double maxG, double maxB) {
-		if(mode < settingsVals.length)
+		if(mode >= 0 && mode < settingsVals.length)
 			colorMode(settingsVals[mode], maxR, maxG, maxB);
 		else
-			exitWithError("Undefined colorMode mode " + mode, 3);
+			colorMode(SETTINGS.RGB, maxR, maxG, maxB);
 		
 	}
 	
@@ -826,10 +832,10 @@ public class Sketch {
 		colorModeVal = mode;
 	}
 	public final void colorMode(int mode, double maxR, double maxG, double maxB, double maxA) {
-		if(mode < settingsVals.length)
+		if(mode >= 0 && mode < settingsVals.length)
 			colorMode(settingsVals[mode], maxR, maxG, maxB, maxA);
 		else
-			exitWithError("Undefined colorMode mode " + mode, 3);
+			colorMode(SETTINGS.RGB, maxR, maxG, maxB, maxA);
 		
 	}
 	
@@ -838,10 +844,10 @@ public class Sketch {
 		ellipseModeVal = mode;
 	}
 	public final void ellipseMode(int mode) {
-		if(mode < settingsVals.length)
+		if(mode >= 0 && mode < settingsVals.length)
 			ellipseModeVal = settingsVals[mode];
 		else
-			exitWithError("Undefined ellipse mode " + mode, 3);
+			ellipseModeVal = SETTINGS.CENTER;
 		
 	}
 
@@ -849,10 +855,10 @@ public class Sketch {
 		rectModeVal = mode;
 	}
 	public final void rectMode(int mode) {
-		if(mode < settingsVals.length)
+		if(mode >= 0 && mode < settingsVals.length)
 			rectModeVal = settingsVals[mode];
 		else
-			exitWithError("Undefined rect mode " + mode, 3);
+			rectModeVal = SETTINGS.CORNER;
 		
 	}
 
@@ -861,10 +867,36 @@ public class Sketch {
 	}
 	
 	public final void imageMode(int mode) {
-		imageModeVal = settingsVals[mode];
+		if(mode >= 0 && mode < settingsVals.length)
+			imageModeVal = settingsVals[mode];
+		else
+			imageModeVal = SETTINGS.CENTER;
+		
 	}
 
-
+	public final void strokeCap(int mode) {
+		if(mode >= 15 && mode <= 17)
+			strokeCapVal = settingsVals[mode];
+		else
+			strokeCapVal = SETTINGS.ROUND;
+	}
+	
+	public final void strokeCap(SETTINGS mode) {
+		switch(mode) {
+		case SQUARE:
+			pen.setLineCap(StrokeLineCap.BUTT);
+			break;
+		case PROJECT:
+			pen.setLineCap(StrokeLineCap.SQUARE);
+			break;
+		case ROUND:
+		default:
+			pen.setLineCap(StrokeLineCap.ROUND);
+			break;
+		}
+	}
+	
+	
 	public final void line(double x1, double y1, double x2, double y2) {
 		pen.strokeLine(x1 + xOffset, y1 + yOffset, x2 + xOffset, y2 + yOffset);
 	}

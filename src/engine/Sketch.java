@@ -112,7 +112,7 @@ public class Sketch {
 	boolean isLoop = true;
 	// Mouse
 	public float mouseX = FileManager.init();
-	public float mouseY = 0;
+	public float mouseY = 0, pmouseX = 0, pmouseY = 0;
 	public SETTINGS mouseButton = SETTINGS.NONE;
 	public boolean mousePressed;
 	public boolean keyPressed;

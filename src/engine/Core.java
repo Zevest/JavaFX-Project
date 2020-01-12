@@ -211,7 +211,9 @@ public class Core extends Application {
     	scene.addEventHandler(MouseEvent.MOUSE_MOVED, new EventHandler<MouseEvent>( ) {
     		@Override
     		public void handle(MouseEvent mouseEvent) {
+    			sketch.pmouseX = sketch.mouseX;
     			sketch.mouseX =(float) mouseEvent.getX();
+    			sketch.pmouseY = sketch.mouseY;
     			sketch.mouseY =(float) mouseEvent.getY();
     			sketch.mouseMove();
     			//sketch.mouseMove(mouseEvent);

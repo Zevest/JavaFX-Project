@@ -321,6 +321,7 @@ public class Core extends Application {
     	sketch.setContext(canvas);
     	sketch.displayWidth = (short) bound.getWidth();
     	sketch.displayHeight = (short) bound.getHeight();
+    	mainStage.setTitle(Core.projectName);
     	sketch.setup();
     	mainStage.sizeToScene();
     	//mainStage.setHeight(sketch.height+35);

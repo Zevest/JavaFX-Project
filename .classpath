@@ -4,11 +4,12 @@
 	<classpathentry kind="src" path="ressources"/>
 	<classpathentry kind="src" path="sketchBooks"/>
 	<classpathentry kind="src" path="preCompiler"/>
+	<classpathentry kind="src" path="Compiler"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.USER_LIBRARY/JavaFX12"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JavaFX12"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

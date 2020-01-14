@@ -1,5 +1,8 @@
 package engine;
 
+import java.io.File;
+import java.nio.file.Paths;
+
 import constant.CURSOR;
 import constant.SETTINGS;
 import javafx.application.Application;
@@ -41,14 +44,24 @@ public class Core extends Application {
 	protected Sketch sketch; 
 	static int error;
 	protected CURSOR cursor = CURSOR.ARROW;
-	static String dirPath = FileManager.path("sketchBooks","project3");
+	static String projectName = "project3";
+	static String dirPath = FileManager.path("sketchBooks",projectName);
+	
 	static Window window;
 	static Rectangle2D bound;
+	
 	static boolean redraw = false;
+	
 	
     public static void main(String[] args) {
         /*Application.launch(Core.class, args);*/
-    	System.out.println("test 2");
+    	for(String str: args)
+    		System.out.println(str);
+    	if(args.length > 0)
+    		dirPath = args[0];
+    	System.out.println("dirPath is "+dirPath);
+    	projectName = Paths.get(dirPath).getFileName().toString();
+    	System.out.println("PojectName is " + projectName);
     	//new SketchTemplate(FileManager.listFile(dirPath,"pjfx"), dirPath);
     	Application.launch(Core.class, args);
     	System.exit(error);
@@ -90,7 +103,7 @@ public class Core extends Application {
     	sketch.frameRate = (float) frameRate;
     	++sketch.frameCount;
     	if(sketch.finished == true) {
-    		error = sketch.error;
+    		error = Sketch.error;
     		Platform.exit();
     	}
     	

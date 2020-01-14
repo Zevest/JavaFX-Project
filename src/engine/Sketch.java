@@ -5,7 +5,6 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Stack;
-
 import constant.CURSOR;
 import constant.SETTINGS;
 import javafx.scene.canvas.Canvas;
@@ -24,7 +23,6 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.shape.StrokeLineCap;
 import util.*;
-
 
 public class Sketch {
 
@@ -104,14 +102,15 @@ public class Sketch {
 	public float frameRate;
 	public float deltaTime;
 	public float deltaTimeMillis;
-
+	private boolean fileLoaded = false; 
+	
 	private Canvas can;
 	GraphicsContext pen;
 	private float targetFrameRate = 60f;
 	public long frameCount;
 	boolean isLoop = true;
 	// Mouse
-	public float mouseX = FileManager.init();
+	public float mouseX = 0;
 	public float mouseY = 0, pmouseX = 0, pmouseY = 0;
 	public SETTINGS mouseButton = SETTINGS.NONE;
 	public boolean mousePressed;
@@ -127,7 +126,7 @@ public class Sketch {
 	public int minXChange = 0, minYChange = 0, maxXChange = width, maxYChange = height;
 	int maxWidth;
 	int[] pixels;
-	String sketchName = "sketch";
+	String sketchName = Core.projectName;
 	public Surface surface = new Surface(sketchName);
 	// BufferedImage test;
 	private boolean loaded;
@@ -633,7 +632,14 @@ public class Sketch {
 		}
 		System.out.print(buffer);
 	}
-
+	
+	public final void printArray(Object[] objs) {
+		String buffer = "";
+		for (int i = 0; i < objs.length; ++i) {
+			buffer += String.format("[%d] %s\n",i, objs[i].toString());
+		}
+		System.out.print(buffer);
+	}
 	public final void frameRate(float rate) {
 		targetFrameRate = rate;
 	}
@@ -1374,8 +1380,21 @@ public class Sketch {
 		yScale = y;
 		pen.scale(x, y);
 	}
-
+	/*
+	public final JSONObject loadJSONObject(String fileName) {
+		if(!fileLoaded) {
+			fileLoaded = true;
+			FileManager.init(FileManager.path(Core.dirPath, "data"));
+		}
+		String path = FileManager.getFilePath(fileName);
+		return new JSONObject(path);
+	}
+	*/
 	public final Image loadImage(String Name) {
+		if(!fileLoaded) {
+			fileLoaded = true;
+			FileManager.init(FileManager.path(Core.dirPath, "data"));
+		}
 		String url = FileManager.getFileUrl(Name);
 		if (url != null)
 			return new Image(url);

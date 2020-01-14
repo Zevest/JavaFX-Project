@@ -1,18 +1,15 @@
 public void setup() {
 	size(500, 500);
-	/*JSONObject t = new JSONObject();
+	JSONObject t = new JSONObject();
 	JSONArray arr = new JSONArray();
 	arr.setInt(0, 10);
 	arr.setString(1, "Wages");
 	arr.setFloat(2, 4230.568);
-	t.setString("name", "Steve");
+	t.setString("name", "Marc");
 	t.setFloat("PI", 3.14);
 	t.setInt("age", 19);
 	t.setJSONArray("array", arr);
 	println(t);
-	println("Salut");
-	println("Saved ?: "+ saveJSONObject(t, "test.json", 4));*/
-	JSONObject t = loadJSONObject("test.json");
-	println(t);
+	println("Saved ?: "+ saveJSONObject(t, "test.json", 4));
 	exit();
 }

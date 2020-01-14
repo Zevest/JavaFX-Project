@@ -12,16 +12,15 @@ import java.nio.file.Paths;
 public final class FileManager {
 	public static String dataFolderPath;
 	
-	public static int init(String path){
+	public static boolean init(String path){
 		dataFolderPath = path;
-		new File(dataFolderPath).mkdir();
-		return 0;
+		System.out.println(dataFolderPath);
+		return  new File(dataFolderPath).mkdir();
 	}
 	
-	public static int init() {
+	public static boolean init() {
 		dataFolderPath = "ressources";
-		new File(dataFolderPath).mkdir();
-		return 0;
+		return new File(dataFolderPath).mkdir();
 	}
 	
 	public static String path(String first, String ...other) {
@@ -29,7 +28,7 @@ public final class FileManager {
 	}
 	
 	public static BufferedReader createReader(String fileName) {
-		Path path = Paths.get(System.getProperty("user.dir"), dataFolderPath, fileName);
+		Path path = Paths.get(dataFolderPath, fileName);
 		BufferedReader br;
 		try {
 			br = Files.newBufferedReader(path);
@@ -41,15 +40,15 @@ public final class FileManager {
 	}
 	
 	public static String getFolderPath() {
-		return Paths.get(System.getProperty("user.dir"), dataFolderPath).toString();
+		return Paths.get(dataFolderPath).toString();
 	}
 	
 	public static String getFolderUrl() {
-		return Paths.get(System.getProperty("user.dir"), dataFolderPath).toUri().toString();
+		return Paths.get(dataFolderPath).toUri().toString();
 	}
 	
 	public static String getFilePath(String fileName) {
-		Path filePath = Paths.get(System.getProperty("user.dir"), dataFolderPath, fileName);
+		Path filePath = Paths.get(dataFolderPath, fileName);
 		if(new File(filePath.toString()).exists())
 			return filePath.toString();
 		return null;
@@ -64,14 +63,14 @@ public final class FileManager {
 	}
 	
 	public static String getFileUrl(String fileName) {
-		Path filePath = Paths.get(System.getProperty("user.dir"), dataFolderPath, fileName);
+		Path filePath = Paths.get(dataFolderPath, fileName);
 		if(new File(filePath.toString()).exists())
 			return filePath.toUri().toString();
 		return null;
 	}
 	
 	public static String getFileUrl(String fileName, String path) {
-		Path filePath = Paths.get(System.getProperty("user.dir"), path, fileName);
+		Path filePath = Paths.get(path, fileName);
 		if(new File(filePath.toString()).exists())
 			return filePath.toUri().toString();
 		return null;

@@ -17,6 +17,8 @@ public class PreCompiler {
 			"import java.util.HashMap",
 			"import javafx.scene.input.KeyCode",
 			"import java.io.BufferedReader",
+			"import engine.JSONObject",
+			"import engine.JSONArray"
 	};
 	String className = "__UserDefault";
 	String sketchFileName;

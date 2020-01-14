@@ -1,7 +1,11 @@
 package engine;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.IntBuffer;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Stack;
@@ -23,6 +27,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.shape.StrokeLineCap;
 import util.*;
+
 
 public class Sketch {
 
@@ -136,8 +141,6 @@ public class Sketch {
 
 	static int error = 0;
 	
-
-
 	private final void loadPixels() {
 		if(pixels == null || pixels.length < maxWidth*height)
 			pixels = new int[maxWidth * height];
@@ -192,7 +195,6 @@ public class Sketch {
 	final boolean getLoaded() {
 		return loaded;
 	}
-	
 	
 	
 	public final color get(int x, int y) {
@@ -543,6 +545,8 @@ public class Sketch {
 		return (float) Noise.noise3D((float) x, (float) y, (float) z);
 	}
 
+	
+	////////////////////////// color //////////////////////////
 	public final color color(long v) {
 		double red = (v & 0xff) / 255.0;
 		double green = ((v >> 8) & 0xff) / 255.0;
@@ -614,32 +618,41 @@ public class Sketch {
 		}
 	}
 
+	//////////////////////// print ///////////////////////
 	public final void println(Object o, Object... other) {
-		String buffer = o.toString();
+		StringBuilder buffer = new StringBuilder();
+		buffer.append(o.toString());
 		for (Object e : other) {
-			if (e != null)
-				buffer += " " + e.toString();
+			if (e != null) {
+				buffer.append(" ");
+				buffer.append(e.toString());
+			}
 			else
-				buffer += " null";
+				buffer.append(" null");
 		}
-		System.out.println(buffer);
+		System.out.println(buffer.toString());
 	}
 
 	public final void print(Object o, Object... other) {
-		String buffer = o.toString();
+		StringBuilder buffer = new StringBuilder();
+		buffer.append(o.toString());
 		for (Object e : other) {
-			buffer += " " + e.toString();
+			buffer.append(" ");
+			buffer.append(e.toString());
 		}
-		System.out.print(buffer);
+		System.out.print(buffer.toString());
 	}
 	
 	public final void printArray(Object[] objs) {
-		String buffer = "";
+		StringBuilder buffer = new StringBuilder();
 		for (int i = 0; i < objs.length; ++i) {
-			buffer += String.format("[%d] %s\n",i, objs[i].toString());
+			buffer.append(String.format("[%d] %s\n",i, objs[i].toString()));
 		}
-		System.out.print(buffer);
+		System.out.print(buffer.toString());
 	}
+	
+	////////////////////////// Speed //////////////////////////
+	
 	public final void frameRate(float rate) {
 		targetFrameRate = rate;
 	}
@@ -656,7 +669,7 @@ public class Sketch {
 		isLoop = false;
 	}
 
-	/// Draw function
+	///////////////////// Drawing //////////////////////////
 	public final void clear() {
 		pen.clearRect(0, 0, width, height);
 	}
@@ -1073,7 +1086,7 @@ public class Sketch {
 
 	
 	public final void point(double x, double y) {
-		//pen.
+		pen.strokeOval(x, y, 1, 1);
 	}
 	
 	
@@ -1149,6 +1162,8 @@ public class Sketch {
 		verticesY.add(y4);
 	}
 
+	// TODO: curveVertext function
+	
 	/*public final void curveVertex(double x, double y) {
 		double x, y, step = 1.0/curvePointVal;
 		pen.beginPath();
@@ -1380,22 +1395,130 @@ public class Sketch {
 		yScale = y;
 		pen.scale(x, y);
 	}
-	/*
+	
+	//////////////////////// JSON //////////////////////
+	
 	public final JSONObject loadJSONObject(String fileName) {
-		if(!fileLoaded) {
-			fileLoaded = true;
-			FileManager.init(FileManager.path(Core.dirPath, "data"));
+		println(fileName);
+		String path;
+		if(fileName.indexOf(File.separator) >= 0) {
+			String name = Paths.get(fileName).getFileName().toString();
+			String dir = Paths.get(fileName).getParent().toString();
+			path = FileManager.getFilePath(dir, name);
+		} else {
+			if(!fileLoaded) {
+				fileLoaded = true;
+				FileManager.init(FileManager.path(Core.dirPath,Core.projectName, "data"));
+			}
+			path = FileManager.getFilePath(fileName);
 		}
-		String path = FileManager.getFilePath(fileName);
-		return new JSONObject(path);
+		println(path);
+		
+		try {
+			return new JSONObject(path);
+		}
+		catch(FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
-	*/
-	public final Image loadImage(String Name) {
-		if(!fileLoaded) {
-			fileLoaded = true;
-			FileManager.init(FileManager.path(Core.dirPath, "data"));
+	
+	public final JSONArray loadJSONArray(String fileName) {
+		String path;
+		if(fileName.indexOf(File.separator) >= 0) {
+			
+			String name = Paths.get(fileName).getFileName().toString();
+			String dir = Paths.get(fileName).getParent().toString();
+			path = FileManager.getFilePath(dir, name);
+		} else {
+			if(!fileLoaded) {
+				fileLoaded = true;
+				FileManager.init(FileManager.path(Core.dirPath,Core.projectName, "data"));
+			}
+			path = FileManager.getFilePath(fileName);
 		}
-		String url = FileManager.getFileUrl(Name);
+		try {
+			return new JSONArray(path);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public final boolean saveJSONObject(JSONObject json, String filename) {
+		
+		if(filename.indexOf(File.separator) >= 0) {
+			String name = Paths.get(filename).getFileName().toString();
+			String dir = Paths.get(filename).getParent().toString();
+			return FileManager.newFile(name, dir, json.toString());
+		}else {
+			if(!fileLoaded) {
+				fileLoaded = true;
+				FileManager.init(FileManager.path(Core.dirPath,Core.projectName, "data"));
+			}
+			return FileManager.newFile(filename, FileManager.path(Core.dirPath,Core.projectName, "data"), json.toString());
+		}
+	}
+	
+	public final boolean saveJSONObject(JSONObject json, String filename, int indentation) {
+		if(filename.indexOf(File.separator) >= 0) {
+			String name = Paths.get(filename).getFileName().toString();
+			String dir = Paths.get(filename).getParent().toString();
+			return FileManager.newFile(name, dir, json.toString(indentation));
+		}else {
+			if(!fileLoaded) {
+				fileLoaded = true;
+				FileManager.init(FileManager.path(Core.dirPath,Core.projectName, "data"));
+			}
+			return FileManager.newFile(filename, FileManager.path(Core.dirPath,Core.projectName, "data"), json.toString(indentation));
+		}
+	}
+	
+	public final boolean saveJSONArray(JSONArray json, String filename) {
+		if(filename.indexOf(File.separator) >= 0) {
+			String name = Paths.get(filename).getFileName().toString();
+			String dir = Paths.get(filename).getParent().toString();
+			return FileManager.newFile(name, dir, json.toString());
+		}else {
+			if(!fileLoaded) {
+				fileLoaded = true;
+				FileManager.init(FileManager.path(Core.dirPath,Core.projectName, "data"));
+			}
+			return FileManager.newFile(filename, FileManager.path(Core.dirPath,Core.projectName, "data"), json.toString());
+		}
+	}
+	
+	public final boolean saveJSONArray(JSONArray json, String filename, int indentation) {
+		if(filename.indexOf(File.separator) >= 0) {
+			String name = Paths.get(filename).getFileName().toString();
+			String dir = Paths.get(filename).getParent().toString();
+			return FileManager.newFile(name, dir, json.toString(indentation));
+		}else {
+			if(!fileLoaded) {
+				fileLoaded = true;
+				FileManager.init(FileManager.path(Core.dirPath,Core.projectName, "data"));
+			}
+			return FileManager.newFile(filename, FileManager.path(Core.dirPath,Core.projectName, "data"), json.toString(indentation));
+		}
+	}
+	
+	//////////////////////// Image ///////////////////////
+	
+	public final Image loadImage(String fileName) {
+		String url;
+		if(fileName.indexOf(File.separator) >= 0) {
+			String name = Paths.get(fileName).getFileName().toString();
+			String dir = Paths.get(fileName).getParent().toString();
+			url = FileManager.getFileUrl(dir, name);
+			
+		} else {
+			if(!fileLoaded) {
+				fileLoaded = true;
+				FileManager.init(FileManager.path(Core.dirPath,Core.projectName, "data"));
+			}
+			url = FileManager.getFileUrl(fileName);
+		}
 		if (url != null)
 			return new Image(url);
 		System.err.println("Error: image not found.");
@@ -1414,7 +1537,8 @@ public class Sketch {
 			System.err.println("Invalid Image Draw Mode : " + imageModeVal);
 		}
 	}
-
+	
+	
 	public final void image(Image img, double x, double y, double w, double h) {
 		switch (imageModeVal) {
 		case CENTER:

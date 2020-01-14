@@ -45,7 +45,7 @@ public class Core extends Application {
 	static int error;
 	protected CURSOR cursor = CURSOR.ARROW;
 	static String projectName = "project3";
-	static String dirPath = FileManager.path("sketchBooks",projectName);
+	static String dirPath = FileManager.path("sketchBooks");
 	
 	static Window window;
 	static Rectangle2D bound;
@@ -60,7 +60,10 @@ public class Core extends Application {
     	if(args.length > 0)
     		dirPath = args[0];
     	System.out.println("dirPath is "+dirPath);
-    	projectName = Paths.get(dirPath).getFileName().toString();
+    	if(args.length > 1) 
+    		projectName = args[1];
+    	else
+    		projectName = Paths.get(dirPath).getFileName().toString();
     	System.out.println("PojectName is " + projectName);
     	//new SketchTemplate(FileManager.listFile(dirPath,"pjfx"), dirPath);
     	Application.launch(Core.class, args);

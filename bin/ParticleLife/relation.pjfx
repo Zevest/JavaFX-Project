@@ -1,0 +1,11 @@
+HashMap<String, HashMap<String,Float>> createTable(String[] name){
+  HashMap<String, HashMap<String,Float>> tables = new HashMap<String, HashMap<String,Float>>();
+  for(int i = 0; i < name.length; i++){
+    HashMap<String, Float> r = new HashMap<String, Float>();
+    for(int j = 0; j < name.length; j++){  
+      r.put(name[j], (float)random(-2,2));
+    }
+    tables.put(name[i], r);
+  }
+  return tables;
+}

@@ -1,0 +1,328 @@
+class World{
+  int[] data, buffer;
+  int w,h;
+  int livingCell =0, freezedCell=0, infectedCell=0;
+  
+  World(int wi, int he){
+    w = wi;
+    h = he;
+    data = new int[w*h];
+    buffer = new int[w*h];
+    refreshBuffer();
+    for(int i  = 0; i < w*h; i++){
+      data[i] = 0;
+    }
+  }
+  void refreshBuffer(){
+    for(int i  = 0; i < w*h; i++){
+      buffer[i] = 0;
+    }
+  }
+  void display(){
+    int Width = (int) width/w;
+    int Height = (int) height/h;
+    noStroke();
+    for(int i = 0; i < w*h; i++){
+       switch(data[i]){
+         case 1:
+           fill(255);
+           rect((i % w) * Width,((int) i/h) * Height ,Width, Height);
+           break;
+         case 2: 
+           fill(255,0,0);
+           rect((i % w) * Width,((int) i/h) * Height ,Width, Height);
+           break;
+         case 3: 
+           fill(0,255,0);
+           rect((i % w) * Width,((int) i/h) * Height ,Width, Height);
+           break;
+         case 6:
+         case 4: 
+           fill(20,127,200);
+           rect((i % w) * Width,((int) i/h) * Height ,Width, Height);
+           break;
+         case 5: 
+           fill(0,0,255);
+           rect((i % w) * Width,((int) i/h) * Height ,Width, Height);
+           break;
+       }
+    }
+    textSize(20);
+    fill(255);
+    text("Healthy Cells : " + livingCell, 10,20);
+    text("Frozen Cells : " + freezedCell, 10,40);
+    text("Infected Cells : " + infectedCell, 10,60);
+    
+  }
+  
+  void update(){
+    //refreshBuffer();
+    updateTree();
+    addTree();
+    updateFire();
+    addFire();
+    updatePoison();
+    addPoison();
+    updateFreeze();
+    addFreeze();
+    addUnfreeze();
+    updateUnfreeze();
+    countCell();
+    swapBuffer();
+  }
+  
+  void countCell(){
+    livingCell = 0;
+    infectedCell = 0;
+    freezedCell = 0;
+    for(int i = 0; i < w*h; i++){
+      if(world.data[i] == 1)
+        livingCell++;
+      if(world.data[i] == 6)
+        freezedCell++;
+      if(world.data[i] == 3)
+        infectedCell++;
+    }
+  }
+  
+  void swapBuffer(){
+    for(int i = 0; i < w*h; i++)
+      data[i] = buffer[i];
+  }
+  
+  void addTree(){
+    if(random(1) < TREE_SPAWN_RATE){
+      int x = (int) random(w);
+      int y = (int) random(h);
+      buffer[y*w +x] = 1;
+    }
+    if(random(1) < 0.05){
+      addTree();
+    }
+  }
+  
+  void updateTree(){
+    for(int i = 0; i < w*h; i++){
+      int[] temp = coord(i);
+      int x = temp[0]; 
+      int y = temp[1];
+      if(canSpread(data[i])){
+        if(data[i] == 1){
+          if(y>0 && random(1) < SPREAD_RATE[data[i]] && data[index(x, y-1)]== 0)
+            set(x, y-1, data[i]);
+          if(y<h-1 && random(1) < SPREAD_RATE[data[i]] && data[index(x, y+1)]== 0)
+            set(x, y+1, data[i]);
+          if(x>0 && random(1) < SPREAD_RATE[data[i]] && data[index(x-1, y)]== 0)
+            set(x-1, y, data[i]);
+          if(x<w-1 && random(1) < SPREAD_RATE[data[i]] && data[index(x+1, y)]== 0)
+            set(x+1, y, data[i]);
+        }else{
+          if(y>0 && random(1) < SPREAD_RATE[data[i]] && data[index(x, y-1)]== 1)
+            set(x, y-1, data[i]);
+          if(y<h-1 && random(1) < SPREAD_RATE[data[i]] && data[index(x, y+1)]== 1)
+            set(x, y+1, data[i]);
+          if(x>0 && random(1) < SPREAD_RATE[data[i]] && data[index(x-1, y)]== 1)
+            set(x-1, y, data[i]);
+          if(x<w-1 && random(1) < SPREAD_RATE[data[i]] && data[index(x+1, y)]== 1)
+            set(x+1, y, data[i]);
+        }
+      }
+    }  
+  }
+  
+  void updatePoison(){
+    for(int i = 0; i < w*h; i++){
+      int[] temp = coord(i);
+      int x = temp[0]; 
+      int y = temp[1];
+      if(data[i] == 3){
+        int nb = 0;
+        if(y>0 && random(1) < POISON_DEATH_RATE){
+          set(x, y-1, 0);
+          nb++;
+        }
+        if(y<h-1 && random(1) < POISON_DEATH_RATE){
+          set(x, y+1, 0);
+          nb++;
+        }
+        if(x>0 && random(1) < POISON_DEATH_RATE){
+          set(x-1, y, 0);
+          nb++;
+        }
+        if(x<w-1 && random(1) < POISON_DEATH_RATE){
+          set(x+1, y, 0);
+          nb++;
+        }
+        if (nb < 1 && random(1) < POISON_DEATH_RATE){
+          buffer[i] = 0;
+        } 
+      }
+    }  
+  }
+  
+  void addPoison(){
+    if(random(1) < POISON_SPAWN_RATE){
+      int x = (int) random(w);
+      int y = (int) random(h);
+      if(data[y*w +x] == 1)
+        buffer[y*w +x] = 3;
+    }
+  }
+  
+  void addFire(){
+    if(random(1) < FIRE_SPAWN_RATE){
+      int x = (int) random(w);
+      int y = (int) random(h);
+      buffer[y*w +x] = 2;
+    }
+    if(random(1) < FIRE_SPAWN_RATE){
+      addFire();
+    }
+  }
+  void updateFire(){
+    for(int i = 0; i < w*h; i++){
+      int[] temp = coord(i);
+      int x = temp[0]; 
+      int y = temp[1];
+      if(data[i] == 2){
+        if(y>0 && isBurnable(data[index(x, y-1)])){
+          set(x, y-1, 2);
+          /*if(x>0 && isBurnable(data[index(x-1, y-1)])){
+            set(x-1, y-1, 2);
+          }
+          if(x<w-1 && isBurnable(data[index(x+1, y-1)])){
+            set(x+1, y-1, 2);
+          }*/
+        }
+        if(y<h-1 && isBurnable(data[index(x, y+1)])){
+          set(x, y+1, 2);
+          /*if(x>0 && isBurnable(data[index(x-1, y+1)])){
+            set(x-1, y+1, 2);
+          }
+          if(x<w-1 && isBurnable(data[index(x+1, y+1)])){
+            set(x+1, y+1, 2);
+          }*/
+        }
+        if(x>0 && isBurnable(data[index(x-1, y)])){
+          set(x-1, y, 2);
+        }
+        if(x<w-1 && isBurnable(data[index(x+1, y)])){
+          set(x+1, y, 2);
+        }
+        buffer[i] = 0;
+      }
+    }  
+  }
+  
+  void updateFreeze(){
+    for(int i = 0; i < w*h; i++){
+      int[] temp = coord(i);
+      int x = temp[0]; 
+      int y = temp[1];
+      if(data[i] == 4){
+        if(y>0 && data[index(x, y-1)]== 1){
+          set(x, y-1, 4);
+          if(x>0 && data[index(x-1, y-1)]== 1){
+            set(x-1, y-1, 4);
+          }
+          if(x<w-1 && data[index(x+1, y-1)]== 1){
+            set(x+1, y-1, 4);
+          }
+        }
+        if(y<h-1 && data[index(x, y+1)]== 1){
+          set(x, y+1, 4);
+          if(x>0 && data[index(x-1, y+1)]== 1){
+            set(x-1, y+1, 4);
+          }
+          if(x<w-1 && data[index(x+1, y+1)]== 1){
+            set(x+1, y+1, 4);
+          }
+        }
+        if(x>0 && data[index(x-1, y)]== 1){
+          set(x-1, y, 4);
+        }
+        if(x<w-1 && data[index(x+1, y)]== 1){
+          set(x+1, y, 4);
+        }
+        buffer[i] = 6;
+      }
+    }  
+  }
+  
+  void addFreeze(){
+    if(random(1) < FREEZE_SPAWN_RATE){
+      int x = (int) random(w);
+      int y = (int) random(h);
+      if(data[y*w +x] == 1);
+        set(x,y,4);
+    }
+  }
+  
+  void updateUnfreeze(){
+    for(int i = 0; i < w*h; i++){
+      int[] temp = coord(i);
+      int x = temp[0]; 
+      int y = temp[1];
+      if(data[i] == 5){
+        if(y>0 && data[index(x, y-1)]== 6){
+          set(x, y-1, 5);
+          if(x>0 && data[index(x-1, y-1)]== 6){
+            set(x-1, y-1, 5);
+          }
+          if(x<w-1 && data[index(x+1, y-1)]== 6){
+            set(x+1, y-1, 5);
+          }
+        }
+        if(y<h-1 && data[index(x, y+1)]== 6){
+          set(x, y+1, 5);
+          if(x>0 && data[index(x-1, y+1)]== 6){
+            set(x-1, y+1, 5);
+          }
+          if(x<w-1 && data[index(x+1, y+1)]== 6){
+            set(x+1, y+1, 5);
+          }
+        }
+        if(x>0 && data[index(x-1, y)]== 6){
+          set(x-1, y, 5);
+        }
+        if(x<w-1 && data[index(x+1, y)]== 6){
+          set(x+1, y, 5);
+        }
+        buffer[i] = 1;
+      }
+    }  
+  }
+  
+  void addUnfreeze(){
+    if(random(1) < UNFREEZE_SPAWN_RATE){
+      int x = (int) random(w);
+      int y = (int) random(h);
+      if(data[y*w +x] == 6)
+        buffer[y*w +x] = 5;
+    }
+  
+  };
+  
+  
+  
+  boolean isBurnable(int v){
+    return (v == 1 || (v >= 3 && v <= 6));
+  }
+  
+  boolean canSpread(int v){
+    return (v == 1 || v == 3);
+  }
+  
+  void set(int x, int y, int val){
+    buffer[index(x,y)] = val;
+  }
+  
+  int[] coord(int index){
+    int[] temp = {index % w, (int) index/h};
+    return temp;
+  }
+  
+  int index(int x, int y){
+    return y * w + x;
+  }
+}

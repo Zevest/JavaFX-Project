@@ -238,8 +238,8 @@ public class Core extends Application {
     			sketch.mouseX =(float) mouseEvent.getX();
     			sketch.pmouseY = sketch.mouseY;
     			sketch.mouseY =(float) mouseEvent.getY();
-    			sketch.mouseMove();
-    			//sketch.mouseMove(mouseEvent);
+    			sketch.mouseMoved();
+    			//sketch.mouseMoved(mouseEvent);
     		}
     	});
     	

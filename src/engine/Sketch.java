@@ -390,7 +390,7 @@ public class Sketch {
 
 	public void mouseDragged() {}
 
-	public void mouseMove() {}
+	public void mouseMoved() {}
 	
 	public void keyPressed() {}
 

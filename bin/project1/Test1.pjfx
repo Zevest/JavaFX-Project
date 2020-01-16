@@ -1,0 +1,19 @@
+
+Test5 ques;
+public void setup() {
+	size(500, 500);
+	isItWorking();
+	ques = new Test5("Is is possible");
+	ques.ask();
+	ques.answer();
+}
+
+public void draw() {
+	background(255);
+	textSize(100);
+	rect(0, 0, 200, 200);
+	text("Hi", width/2, height/2);
+	ellipse(width/2, height/2, abs(100*sin(frameCount/100.0)),abs(100* cos(frameCount/100.0)));
+}
+
+

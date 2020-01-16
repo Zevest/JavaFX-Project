@@ -1,0 +1,79 @@
+ArrayList<AABB> bounds = new ArrayList<AABB>();
+
+class AABB{
+  float x, y, sizeX, sizeY;
+  AABB(float x, float y, float s){
+    this.x = x;
+    this.y = y;
+    sizeX = s/2;
+    sizeY = s/2;
+    bounds.add(this);
+  }
+  
+  AABB(float x, float y, float s, boolean added){
+    this.x = x;
+    this.y = y;
+    sizeX = s/2;
+    sizeY = s/2;
+    if(added)
+      bounds.add(this);
+  }
+  
+  AABB(float x, float y, float sx, float sy){
+    this.x = x;
+    this.y = y;
+    sizeX = sx;
+    sizeY = sy;
+    bounds.add(this);
+  }
+  
+  AABB(float x, float y, float sx, float sy, boolean added){
+    this.x = x;
+    this.y = y;
+    sizeX = sx;
+    sizeY = sy;
+    if(added)
+      bounds.add(this);
+  }
+  
+  boolean containsPoint(float x, float y){ 
+	  
+    return (x> this.x - sizeX/2 && x< this.x + sizeX/2)
+        && (y> this.y - sizeY/2 && y< this.y + sizeY/2);
+  }
+  
+  boolean intersectsAABB(AABB range){
+    if(range.x - range.sizeX/2 > x+sizeX/2 || 
+       range.x + range.sizeX/2 < x-sizeX/2 ||
+       range.y - range.sizeY/2 > y+sizeY/2 || 
+       range.y + range.sizeY/2 < y-sizeY/2)
+       return false;
+     return true;
+  }
+  void setPos(float x, float y){
+    this.x = x; this.y = y;
+  }
+  void setPos(PVector pv){
+    this.x = pv.x; this.y = pv.y;
+  }
+  void setSize(float x, float y){
+    this.sizeX = x; this.sizeY = y;
+  }
+  void setSize(PVector pv){
+    this.sizeX = pv.x; this.sizeY = pv.y;
+  }
+}
+
+class CircleRange extends AABB{
+	  
+	  CircleRange(float x, float y, float s){
+	    super(x,y,s, true);
+	  }
+	  boolean containsPoint(float x, float y){
+	    return dist(this.x, this.y, x, y) < this.sizeX/2;
+	  }
+	  
+	  boolean intersect(CircleRange c){
+	    return dist(this.x, this.y, x, y) < this.sizeX/2 + c.sizeX/2;
+	  }
+	}

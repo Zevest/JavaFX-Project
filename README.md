@@ -19,7 +19,7 @@ Finally you have to change the following:
   * __keyReleased()__
   * __keyTyped()__
 
-## How to Run sketch
+## How to Run your sketch
 
  1. Move to project directory
  2. `java -cp ./bin compiler.Projfx SketchFolderName`

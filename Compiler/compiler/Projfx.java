@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
 
-public class Main {
+public class Projfx {
 	
 	enum OS_NAME{
 		WINDOW,
@@ -64,21 +64,30 @@ public class Main {
 	}
 	
 	public static void main(String[] args) throws InterruptedException {
-		Main.getOS();
+		Projfx.getOS();
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
             	System.out.println("Killing all Processus");
-                Main.destroyAllProcess();	
+                Projfx.destroyAllProcess();	
                 
             }
         });
 		//System.getProperties().list(System.out);
         String projectPath = Paths.get(System.getProperty("user.dir"),"sketchBooks").toString();//"C:\\dev\\pjfx";//
-        String projectName = "jsonTest";//"Test";
+        String projectName = "PImageTest";//"Test";
         if(args.length > 0) {
         	projectName = args[0];
         }
+        if(args.length > 1) {
+        	projectPath = args[1];
+        }
+        File f = new File(Paths.get(projectPath, projectName).toString()); 
+        if(! f.exists()) {
+        	System.err.println("ErrorSketch not Found : " + f.toString());
+        	System.exit(-1);
+        }
+        
        
         
 		String file = Paths.get("sketch", "template", "__UserDefault.java").toString();
@@ -120,13 +129,15 @@ public class Main {
 		String srcPath = Paths.get(System.getProperty("user.dir"), "src").toString();
 //		String srcPath = Paths.get(System.getProperty("user.dir")).toString();
 		
-		String preCompileLine = "java -cp \"" + buildPath + "\" precompiler.PreCompiler";
+		String preCompileLine = "java -cp \"" + bin + "\" precompiler.PreCompiler";
 //		String preCompileLine = "java precompiler.PreCompiler";
 		String preCompileArgs = "--project-path \"" + projectPath + "\" --project-name " + projectName;
 		String compile = "javac "+ classPath +" --module-path "+platformModulePath+ " -d " + bin + " --add-modules javafx.controls " + file;
 		String runLine = "java -XX:+UseParallelGC -Xms1536m -Xmx1536m -XX:NewRatio=2 "+classPath +" --module-path \""+platformModulePath+"\" --add-modules javafx.controls -Djavafx.animation.fullspeed=true -Dfile.encoding=Cp1252 engine.Core " + projectPath + " " +projectName;
 		
-		 
+		/*String clear_linux = "CMD.exe /C dir";
+		String clear_window = "CMD.exe /C dir";
+		 */
 		
 		System.out.println(preCompileArgs);
 		try {
@@ -143,8 +154,25 @@ public class Main {
 			if(runProcess("Compiler", compile, srcPath) != 0) {
 				destroyAllProcess();
 				return;
-			}
-			if(runProcess("Running", runLine, srcPath) != 0) {
+			}/*
+			switch(os) {
+			case WINDOW:
+				if(runProcess("CMD.exe /C cls", srcPath) != 0) {
+					destroyAllProcess();
+					return;
+				}
+				break;
+			default:		
+			case LINUX:
+				//TODO: find the actual linux comand to clear console;
+				if(runProcess("clear", srcPath) != 0) {
+					destroyAllProcess();
+					return;
+				}
+				break;
+			}*/
+			//System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nRunning Sketch");
+			if(runProcess("Running", runLine, srcPath, false) != 0) {
 				destroyAllProcess();
 				return;
 			}
@@ -165,7 +193,7 @@ public class Main {
         BufferedReader in = new BufferedReader(
             new InputStreamReader(ins));
         while ((line = in.readLine()) != null) {
-            System.out.println(cmd + " " + line);
+            System.out.println(cmd + line);
         }
     }
 	
@@ -231,6 +259,7 @@ public class Main {
         return pro.exitValue();
 	}
 	
+	
 	public static int runProcess(String name, String[] command, String dir) throws Exception {
 		String finalCommand = "";
 		for(int i = 0; i < command.length; ++i) {
@@ -264,6 +293,25 @@ public class Main {
         	System.err.println(finalCommand + " exited with " + pro.exitValue());
         else
         	System.out.println(finalCommand + " exited with " + pro.exitValue());
+        return pro.exitValue();
+	}
+	
+	public static int runProcess(String name, String command, String dir, boolean TitleOutput) throws Exception {
+		//System.out.println("Command" + name + " " +  command + " " + dir);
+		Process pro = Runtime.getRuntime().exec(command, null, new File(dir));
+		processList[pid++] = pro;
+		if(TitleOutput) {
+			printLines(name + " stdout:", pro.getInputStream());
+			printErrors(name + " stderr", pro.getErrorStream());
+		}else {
+			printLines("", pro.getInputStream());
+			printErrors("", pro.getErrorStream());
+		}
+        pro.waitFor();
+        if(pro.exitValue() != 0)
+        	System.err.println(name + " exited with " + pro.exitValue());
+        else
+        	System.out.println(name + " exited with " + pro.exitValue());
         return pro.exitValue();
 	}
 }

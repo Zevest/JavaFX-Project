@@ -18,17 +18,19 @@ public enum SETTINGS {
 	CLOSE(14),
 	PROJECT(15),
 	ROUND(16),
-	SQUARE(17);
+	SQUARE(17),
+	UP(18),
+	DOWN(19);
 	
 	
-	private int action;
+	private int val;
 	
 	public int getValue() {
-		return this.action;
+		return this.val;
 	}
 	
-	private SETTINGS(int action) {
-		this.action = action;
+	private SETTINGS(int val) {
+		this.val = val;
 	}
 	
 }

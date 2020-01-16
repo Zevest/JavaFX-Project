@@ -57,36 +57,39 @@ public class Sketch {
 	public float TAU = (float) (2 * Math.PI);
 	public float QUARTER_PI = (float) (Math.PI/4.0);
 	public short width = 200, height = 200,displayWidth, displayHeight;
-	public static final SETTINGS TOP = SETTINGS.TOP;
-	public static final SETTINGS BOTTOM = SETTINGS.BOTTOM;
-	public static final SETTINGS CENTER = SETTINGS.CENTER;
-	public static final SETTINGS LEFT = SETTINGS.LEFT;
-	public static final SETTINGS RIGHT = SETTINGS.RIGHT;
-	public static final SETTINGS CORNER = SETTINGS.CORNER;
-	public static final SETTINGS HSB = SETTINGS.HSB;
-	public static final SETTINGS RGB = SETTINGS.RGB;
-	public static final SETTINGS NEXT = SETTINGS.NEXT;
-	public static final SETTINGS BACK = SETTINGS.BACK;
-	public static final SETTINGS PIE = SETTINGS.PIE;
-	public static final SETTINGS CHORD = SETTINGS.CHORD;
-	public static final SETTINGS OPEN = SETTINGS.OPEN;
-	public static final SETTINGS CLOSE = SETTINGS.CLOSE;
-	public static final SETTINGS PROJECT = SETTINGS.PROJECT;
-	public static final SETTINGS SQUARE = SETTINGS.SQUARE;
-	public static final SETTINGS ROUND = SETTINGS.ROUND;
-	public static final CURSOR ARROW = CURSOR.ARROW;
-	public static final CURSOR CROSS = CURSOR.CROSS;
-	public static final CURSOR HAND = CURSOR.HAND;
-	public static final CURSOR MOVE = CURSOR.MOVE;
-	public static final CURSOR TEXT = CURSOR.TEXT;
-	public static final CURSOR WAIT = CURSOR.WAIT;
-	
 	private static final SETTINGS settingsVals[] = SETTINGS.values();
+	public static final int TOP = 4;
+	public static final int BOTTOM = 5;
+	public static final int CENTER = 3;
+	public static final int LEFT = 1;
+	public static final int RIGHT = 2;
+	public static final int CORNER = 6;
+	public static final int HSB = 10;
+	public static final int RGB = 9;
+	public static final int NEXT = 7;
+	public static final int BACK = 8;
+	public static final int PIE = 11;
+	public static final int CHORD = 12;
+	public static final int OPEN = 13;
+	public static final int CLOSE = 14;
+	public static final int PROJECT = 15;
+	public static final int SQUARE = 17;
+	public static final int ROUND = 16;
+	public static final int UP = 18;
+	public static final int DOWN = 19;
+	public static final int ARROW = 1;
+	public static final int CROSS = 2;
+	public static final int HAND = 3;
+	public static final int MOVE = 4;
+	public static final int TEXT = 5;
+	public static final int WAIT = 6;
+	
+	
 	boolean isFullScreen = false;
 	boolean finished = false;
 	
 
-	CURSOR cursor = ARROW;
+	int cursor = ARROW;
 	SETTINGS ellipseModeVal = SETTINGS.CENTER;
 	SETTINGS rectModeVal = SETTINGS.CORNER;
 	SETTINGS strokeCapVal = SETTINGS.ROUND;
@@ -99,7 +102,7 @@ public class Sketch {
 	SETTINGS colorModeVal = SETTINGS.RGB;
 	private double maxR = 255, maxG = 255, maxB = 255, maxA = 255;
 	
-	private SETTINGS imageModeVal = SETTINGS.CENTER;
+	private SETTINGS imageModeVal = SETTINGS.CORNER;
 
 	private Stack<PenMatrix> matrtixStack = new Stack<PenMatrix>();
 	private Stack<PenStyle> styleStack = new Stack<PenStyle>();
@@ -117,7 +120,7 @@ public class Sketch {
 	// Mouse
 	public float mouseX = 0;
 	public float mouseY = 0, pmouseX = 0, pmouseY = 0;
-	public SETTINGS mouseButton = SETTINGS.NONE;
+	public int mouseButton = SETTINGS.NONE.getValue();
 	public boolean mousePressed;
 	public boolean keyPressed;
 	public String key;
@@ -381,7 +384,7 @@ public class Sketch {
 		return (float) o;
 	}
 
-	public final String _String(Object o) {
+	public final String str(Object o) {
 		return o.toString();
 	}
 
@@ -547,7 +550,7 @@ public class Sketch {
 
 	
 	////////////////////////// color //////////////////////////
-	public final color color(long v) {
+	public final color color(int v) {
 		double red = (v & 0xff) / 255.0;
 		double green = ((v >> 8) & 0xff) / 255.0;
 		double blue = ((v >> 16) & 0xff) / 255.0;
@@ -682,7 +685,7 @@ public class Sketch {
 	}
 
 	public final void background(double val) {
-		pen.setFill(color(val).col);
+		pen.setFill(color(val, val, val).col);
 		pen.fillRect(0, 0, width, height);
 		pen.setFill(fillColor);
 	}
@@ -898,6 +901,7 @@ public class Sketch {
 			strokeCapVal = settingsVals[mode];
 		else
 			strokeCapVal = SETTINGS.ROUND;
+		strokeCap(strokeCapVal);
 	}
 	
 	public final void strokeCap(SETTINGS mode) {
@@ -1326,6 +1330,23 @@ public class Sketch {
 			}
 	}
 
+	public final void textAlign(int modeX) {
+		if(modeX >= 1 && modeX <= 3) {
+			textAlign(settingsVals[modeX]);
+		}else {
+			textAlign(settingsVals[LEFT]);
+		}
+	}
+	
+	public final void textAlign(int modeX, int modeY) {
+		if(modeX >= 1 && modeX <= 3) {
+			if(modeY >= 3 && modeY <=5)
+				textAlign(settingsVals[modeX], settingsVals[modeY]);
+		}else {
+			textAlign(settingsVals[LEFT], settingsVals[BOTTOM]);
+		}
+	}
+	
 	public final void textAlign(SETTINGS modeX) {
 		textAligneValX = modeX;
 		switch (textAligneValX) {
@@ -1505,12 +1526,13 @@ public class Sketch {
 	
 	//////////////////////// Image ///////////////////////
 	
-	public final Image loadImage(String fileName) {
+	public final PImage loadImage(String fileName) {
 		String url;
 		if(fileName.indexOf(File.separator) >= 0) {
 			String name = Paths.get(fileName).getFileName().toString();
 			String dir = Paths.get(fileName).getParent().toString();
-			url = FileManager.getFileUrl(dir, name);
+			println("name: ", name,"dir : ", dir);
+			url = FileManager.getFileUrl(name, dir);
 			
 		} else {
 			if(!fileLoaded) {
@@ -1519,19 +1541,21 @@ public class Sketch {
 			}
 			url = FileManager.getFileUrl(fileName);
 		}
+		//println(url);
 		if (url != null)
-			return new Image(url);
+			return new PImage(url);
 		System.err.println("Error: image not found.");
 		return null;
 	}
 
-	public final void image(Image img, double x, double y) {
+	public final void image(PImage img, double x, double y) {
+		//println(img.im.getWidth());
 		switch (imageModeVal) {
 		case CENTER:
-			pen.drawImage(img, x - img.getWidth() / 2, y - img.getHeight() / 2);
+			pen.drawImage(img.im, x - img.width / 2, y - img.height / 2);
 			break;
 		case CORNER:
-			pen.drawImage(img, x, y);
+			pen.drawImage(img.im, x, y);
 			break;
 		default:
 			System.err.println("Invalid Image Draw Mode : " + imageModeVal);
@@ -1539,33 +1563,135 @@ public class Sketch {
 	}
 	
 	
-	public final void image(Image img, double x, double y, double w, double h) {
+	public final void image(PImage img, double x, double y, double w, double h) {
+		//println(img.get(width/2, height/2));
 		switch (imageModeVal) {
 		case CENTER:
-			pen.drawImage(img, x - w / 2, y - h / 2, w, h);
+			pen.drawImage(img.im, x - w / 2, y - h / 2, w, h);
 			break;
 		case CORNER:
-			pen.drawImage(img, x, y, w, h);
+			pen.drawImage(img.im, x, y, w, h);
 			break;
 		default:
 			System.err.println("Invalid Image Draw Mode : " + imageModeVal);
 		}
 	}
 
-	public final void image(Image img, double dx, double dy, double dw, double dh, double sx, double sy, double sw,
+	public final void image(PImage img, double dx, double dy, double dw, double dh, double sx, double sy, double sw,
 			double sh) {
 		switch (imageModeVal) {
 		case CENTER:
-			pen.drawImage(img, sx, sy, sw, sh, dx - dw / 2, dy - dh / 2, dw, dh);
+			pen.drawImage(img.im, sx, sy, sw, sh, dx - dw / 2, dy - dh / 2, dw, dh);
 			break;
 		case CORNER:
-			pen.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+			pen.drawImage(img.im, sx, sy, sw, sh, dx, dy, dw, dh);
 			break;
 		default:
 			System.err.println("Invalid Image Draw Mode : " + imageModeVal);
 		}
 	}
 
+	public final float red(color col) {
+		float c = (col.getArgb() >> 16) & 0xff;
+		c/=255.0f;
+		return c*(float)maxR;
+	}
+	
+	public final float red(int col) {
+		float c = (col >> 16) & 0xff;
+		c/=255.0f;
+		return c*(float)maxR;
+	}
+	
+	public final float green(int col) {
+		float c = (col >> 8) & 0xff;
+		c/=255.0f;
+		return c*(float)maxG;
+	}
+	public final float green(color col) {
+		float c = (col.getArgb() >> 8) & 0xff;
+		c/=255.0f;
+		return c*(float)maxG;
+	}
+	
+	public final float blue(int col) {
+		float c = col & 0xff;
+		c/=255.0f;
+		return c*(float)maxB;
+	}
+	public final float blue(color col) {
+		float c = (col.getArgb()) & 0xff;
+		c/=255.0f;
+		return c*(float)maxB;
+	}
+	
+	public final float alpha(int col) {
+		float c = (col >> 24) & 0xff;
+		c/=255.0f;
+		return c*(float)maxA;
+	}
+	
+	public final float alpha(color col) {
+		float c = (col.getArgb() >> 24) & 0xff;
+		c/=255.0f;
+		return c*(float)maxA;
+	}
+	
+	public final float hue(int col) {
+		float r = (col >> 16 & 0xff)/(float)maxR;
+		float g = (col >> 8 & 0xff)/(float)maxG;
+		float b = (col & 0xff)/(float)maxB;
+		float cMin = min(r,g,b);
+		float cMax = max(r,g,b);
+		float delta = cMax - cMin;
+		float h;
+		if(delta == 0) 
+			h = 0;
+		else if(cMax == r) 
+			h =  (g-b)/delta%6;
+		else if(cMax == g)
+			h = (b-r)/delta+2;
+		else 
+			h = (r-g)/delta+4;	
+		h *= 60;
+		if(h<0) {
+			h+= 360;
+		}
+		return (h/360.0f*(float)maxR);
+	}
+	
+	public final float hue(color col) {
+		return hue(col.getArgb());
+	}
+	
+	public final float saturation(int col) {
+		float r = (col >> 16 & 0xff)/(float)maxR;
+		float g = (col >> 8 & 0xff)/(float)maxG;
+		float b = (col & 0xff)/(float)maxB;
+		float cMin = min(r,g,b);
+		float cMax = max(r,g,b);
+		float delta = cMax - cMin;
+		if(cMax == 0) {
+			return 0;
+		}
+		return (delta/cMax)*(float)maxG;
+	}
+	
+	public final float saturation(color col) {
+		return saturation(col.getArgb());
+	}
+	
+	public final float brightness(int col) {
+		float r = (col >> 16 & 0xff)/(float)maxR;
+		float g = (col >> 8 & 0xff)/(float)maxG;
+		float b = (col & 0xff)/(float)maxB;
+		return max(r,g,b)*(float)maxB;
+	}
+	
+	public final float brightness(color col) {
+		return brightness(col.getArgb());
+	}
+	
 	public final BufferedReader createReader(String fileName) {
 		return FileManager.createReader(fileName);
 	}
@@ -1574,12 +1700,20 @@ public class Sketch {
 		cursor = ARROW;
 	}
 	
+	public final void cursor(int kind) {
+		if(kind >= 0 && kind <=6)
+			cursor = kind;
+		else
+			cursor();
+			
+	}
+	
 	public final void cursor(CURSOR kind) {
-		cursor = kind;
+		cursor = kind.getValue();
 	}
 	
 	public final void noCursor() {
-		cursor = CURSOR.NONE;
+		cursor = CURSOR.NONE.getValue();
 	}
 	
 	public final void smooth(boolean smoothing) {

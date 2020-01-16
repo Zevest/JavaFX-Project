@@ -43,7 +43,8 @@ public class Core extends Application {
 	private Scene scene;
 	protected Sketch sketch; 
 	static int error;
-	protected CURSOR cursor = CURSOR.ARROW;
+	static CURSOR[] cursorSet = CURSOR.values(); 
+	protected int cursor = CURSOR.ARROW.getValue();
 	static String projectName = "project3";
 	static String dirPath = FileManager.path("sketchBooks");
 	
@@ -55,16 +56,16 @@ public class Core extends Application {
 	
     public static void main(String[] args) {
         /*Application.launch(Core.class, args);*/
-    	for(String str: args)
-    		System.out.println(str);
+    	/*for(String str: args)
+    		System.out.println(str);*/
     	if(args.length > 0)
     		dirPath = args[0];
-    	System.out.println("dirPath is "+dirPath);
+    	//System.out.println("dirPath is "+dirPath);
     	if(args.length > 1) 
     		projectName = args[1];
     	else
     		projectName = Paths.get(dirPath).getFileName().toString();
-    	System.out.println("PojectName is " + projectName);
+    	//System.out.println("PojectName is " + projectName);
     	//new SketchTemplate(FileManager.listFile(dirPath,"pjfx"), dirPath);
     	Application.launch(Core.class, args);
     	System.exit(error);
@@ -114,9 +115,13 @@ public class Core extends Application {
     	
     }
     
-    private void setCursor(CURSOR c) {
-    	cursor = c;
-    	switch(cursor) {
+    private void setCursor(int cursor2) {
+    	if(cursor2 >= 0 && cursor2 < cursorSet.length)
+    		cursor = cursor2;
+    	else
+    		cursor = 1;
+    	CURSOR choice = cursorSet[cursor];
+    	switch(choice) {
     	case CROSS:
     		scene.setCursor(Cursor.CROSSHAIR);
     		break;
@@ -189,22 +194,22 @@ public class Core extends Application {
     	    	
     	        switch(mouseEvent.getButton()) {
     	        case PRIMARY:
-    	        	sketch.mouseButton = SETTINGS.LEFT;
+    	        	sketch.mouseButton = SETTINGS.LEFT.getValue();
     	        	break;
     	        case MIDDLE:
-    	        	sketch.mouseButton = SETTINGS.CENTER;
+    	        	sketch.mouseButton = SETTINGS.CENTER.getValue();
     	        	break;
     	        case SECONDARY:
-    	        	sketch.mouseButton = SETTINGS.RIGHT;
+    	        	sketch.mouseButton = SETTINGS.RIGHT.getValue();
     	        	break;
     	        case FORWARD:
-    	        	sketch.mouseButton = SETTINGS.NEXT;
+    	        	sketch.mouseButton = SETTINGS.NEXT.getValue();
     	        	break;
     	        case BACK:
-    	        	sketch.mouseButton = SETTINGS.BACK;
+    	        	sketch.mouseButton = SETTINGS.BACK.getValue();
     	        	break;
     	        default:
-    	        	sketch.mouseButton = SETTINGS.NONE;
+    	        	sketch.mouseButton = SETTINGS.NONE.getValue();
     	        	break;
     	        }
     	        
@@ -220,7 +225,7 @@ public class Core extends Application {
     	    	sketch.mousePressed = false;
     	    	sketch.mouseReleased();
     	    	//sketch.mouseReleased(mouseEvent);
-    	    	sketch.mouseButton = SETTINGS.NONE;
+    	    	sketch.mouseButton = SETTINGS.NONE.getValue();
     	    }
     	});
     	

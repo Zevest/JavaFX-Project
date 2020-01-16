@@ -1,5 +1,6 @@
 package engine;
 import java.io.FileNotFoundException;
+import java.util.Set;
 
 import org.json.JSONException;
 
@@ -71,7 +72,15 @@ public class JSONArray {
 			return defaultValue;
 		}
 	}
-
+	/*
+	public int[] getIntArray() {
+		json.arr
+	}
+	
+	public String[] getStringArray() {
+		
+	}*/
+	
 	public JSONArray getJSONArray(int index) {
 		return new JSONArray(new JSONArrayWrapper(json.arr.getJSONArray(index)));
 	}
@@ -106,6 +115,27 @@ public class JSONArray {
 	public void setJSONArray(int index, JSONArray value) {
 		json.arr.put(index, value.json.arr);
 	}
+	
+	public int size() {
+		return json.arr.length();
+	}
+	
+	public int[] getIntArray() {
+		int[] l = new int[size()];
+		for(int i = 0; i < size(); ++i) {
+			l[i] = getInt(i);
+		}
+		return l;
+	}
+	
+	public float[] getFloatArray() {
+		float[] l = new float[size()];
+		for(int i = 0; i < size(); ++i) {
+			l[i] = getFloat(i);
+		}
+		return l;
+	}
+	
 	
 	@Override
 	public String toString() {

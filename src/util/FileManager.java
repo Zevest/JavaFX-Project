@@ -14,7 +14,6 @@ public final class FileManager {
 	
 	public static boolean init(String path){
 		dataFolderPath = path;
-		System.out.println(dataFolderPath);
 		return  new File(dataFolderPath).mkdir();
 	}
 	
@@ -96,9 +95,7 @@ public final class FileManager {
 	
 	public static boolean newFile(String fileName, String path, String data) {
 		Path filePath = Paths.get(path, fileName);
-		
 		try {
-			System.out.println(filePath);
 			new File(filePath.toString()).createNewFile();
 			Files.write(filePath, data.getBytes());
 			return true;

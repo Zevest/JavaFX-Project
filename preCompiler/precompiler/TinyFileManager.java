@@ -42,8 +42,7 @@ public final class TinyFileManager {
 	}
 	
 	public static boolean newFile(String fileName, String path, String data) {
-		System.out.println("making new File at "+ path + " Called " + fileName);
-		System.out.println("This is a test");		
+		System.out.println("making new File at "+ path + " Called " + fileName);		
 		Path filePath = Paths.get(path, fileName);
 		try {
 			

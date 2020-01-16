@@ -1,5 +1,6 @@
 package engine;
 import java.io.FileNotFoundException;
+import java.util.Set;
 
 import org.json.JSONException;
 
@@ -105,6 +106,10 @@ public class JSONObject {
 	
 	public void setJSONArray(String key, JSONArray value) {
 		json.obj.put(key, value.json.arr);
+	}
+	
+	public Set<String> keys() {
+		return json.obj.keySet();
 	}
 	
 	

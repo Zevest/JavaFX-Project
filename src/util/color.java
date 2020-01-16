@@ -21,10 +21,10 @@ public class color{
 		System.out.println(step);*/
 		
 		
-		long blue = (long)(b*255) & 0xff;
-		long green = ((long)(g*255)) & 0xff;
-		long red =  ((long)(r*255)) & 0xff;
-		long alpha = ((long)(a*255)) & 0xff;
+		long blue = (long)(b*255);
+		long green = (long)(g*255);
+		long red =  (long)(r*255);
+		long alpha = (long)(a*255);
 		long finalCol = blue + (green<<8) + (red<<16) + (alpha<<24);
 		tmp.setArgb((int)finalCol);
 		float[] v = {

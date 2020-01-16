@@ -14,200 +14,75 @@ import engine.JSONObject;
 import engine.JSONArray;
 import engine.PImage;
 public class __UserDefault extends Sketch{
-class Grid{
-		  String[] world;
-		  int w, h;
-		  float lw;
-		  float lh;
-		  
-		  Grid(int w, int h){
-		    this.w = w;
-		    this.h = h;
-		    lw = width/this.w;
-		    lh = height/this.h;
-		    world = new String[this.w * this.h];
-		  }
-		  
-		  
-		  void display(){
-		    float lw = width/w;
-		    float lh = height/h;
-		    textAlign(CENTER);
-		    textSize(20);
-		    //rectMode(CORNER);
-		    for(int i = 0; i < w*h; i++){
-		      int[] pos = coord(i);
-		      fill(255);
-		      rect(pos[0] * lw, pos[1] * lh, lw, lh); 
-		      if(world[i] != "" && world[i] != null){
-		        fill(0);
-		        text(world[i], pos[0] * lw + lw/2, pos[1]*lh+lh/1.5);
-		      }
-		    }
-		  }
-		  
-		  void set(int x, int y, String val){
-		    println(""+val+" Added to ("+x+","+y+")");
-		    world[index(x,y)] = val;
-		    println(world[index(x,y)] = val);
-		  }
-		  
-		  String get(int x, int y){
-			 // println("getting",world[index(x,y)]);
-		    return world[index(x,y)];
-		  }
-		  
-		  int[] coord(int index){
-		    int[] temp = {index % w, (int) index/h};
-		    return temp;
-		  }
-		  
-		  int index(int x, int y){
-		    return y * w + x;
-		  }
-		}
-/**
- * 
- * Select
- * 
- * 
- * 
- */
+int day, month, year;
+float minL = 0.01f;
+int secH = 50,minH = 50, hourH = 50;
+float diam = min(width, height)/1.5f;
+float offsetY = -50;
+String[] days = {
+		"Sunday","Monday","Tuesday","Wednesday",
+		"Thursday","Friday","Saturday"
+		
+};
+String[] months = {
+		"January","February","March",
+		"April","May","June",
+		"July","August","September",
+		"October","November","December"
+};
 
-Image img;
-Grid grid;
-Turtle t;
-boolean run;
-public void setup(){
-  size(500,500);
-  reset();
-}
-
-void reset() {
-	grid = new Grid(20,20);
-	println("grid.world[0]" + grid.world[0]);
-	t = new Turtle(10,10);
-}
-
-public void draw(){
-  grid.display();
-  if(run) t.update();
-  t.display();
-}
-
-public void mousePressed(){
-  //t.update();
-	//run = true;
-}
-public void mouseRelease() {
-	//run = false;
-}
-
-
-public void keyPressed(){
-  float W = width / grid.w;
-  float H = height / grid.h;
-  int x = (int)(mouseX/W);
-  int y = (int)(mouseY/H);
-  //println(x,y,W,H);
-  
-  //f(keyCode == .SPACE)
-  //t.update();
-  if(key.equals(" "))
-	  run = true;
-  else if(key.equals("r")){
-	  reset();
-  }
-  if(key==CODED){
-    switch(keyCode){
-
-      case DOWN:
-        grid.set(x,y,"D");
-        break;
-      case LEFT:
-        grid.set(x,y,"L");
-        break;
-      case RIGHT:
-        grid.set(x,y,"R");
-        break;
-      default:
-    	  println("other");
-    	  break;
-    }
-  }
-}
-public void keyReleased(){
-  //if(key == " ")
-    run = false;
-}
-/*public void setup() {
-	size(1000, 1000);
-	//System.out.println(FileManager.getFileUrl("anime.jpg"));
-	//img = loadImage("anime.jpg");
+public void setup() {
+	size(500, 500);
+	day = day();
+	month = month();
+	year = year();
+	textAlign(CENTER,CENTER);
+	textSize(30);
+	strokeWeight(20);
+	strokeCap(ROUND);
 }
 
 public void draw() {
 	
+	double sec = System.currentTimeMillis()/1000.0%60;
+	diam = min(width, height)/1.5f;
 	
-}*/
+	background(255);
+	stroke(0, 0, 255);
+	noFill();
+	stroke(0, 0, 255);
+	arc(width/2, height/2 +offsetY, diam-100,
+			diam-100, -HALF_PI,map(hour()%12, 0, 12, 0, TAU)-HALF_PI-minL, OPEN);
+	stroke(0, 255, 0);
+	arc(width/2, height/2+offsetY, diam-50,
+			diam-50, -HALF_PI,map(minute(), 0, 59, 0, TAU)-HALF_PI-minL, OPEN);
+	stroke(255, 0, 0);
+	arc(width/2, height/2+offsetY, diam,
+			diam, -HALF_PI,map(sec, 0, 59, 0, TAU)-HALF_PI-minL, OPEN);
 	
-class Turtle{
-		  int x,y,orient, speed, forward;
-		  float size;
-		  
-		  Turtle(int x,int y){
-		    this.x = x;
-		    this.y = y;
-		    orient = 0;
-		    speed = 1;
-		    forward = 1;
-		    size = grid.lw;
-		  }
-		  
-		  void display(){
-		    pushMatrix();
-		    translate(x * grid.lw+0.5*size, y* grid.lh+0.5*size);
-		    rotate(-HALF_PI*(orient%4));
-		    //println(color(0, 200, 40));
-		    fill(color(0,200,40));
-		    //triangle(-.5*size,-.5*size,-.5*size,.5*size,.5*size,0);
-		    //rectMode(CENTER);
-		    triangle(-0.5*size, -0.5*size, -0.5*size , 0.5*size, 0.5*size, 0);
-		    popMatrix();
-		  }
-		  
-		  void update(){
-			//println(x, y, grid.index(x,y));
-			//println(grid.w, grid.h);
-		    //println(grid.get(x,y));
-		    move(grid.get(x,y));
-		    int[] dirX = {1,0,-1,0};
-		    int[] dirY = {0,-1,0,1};
-		    //println(dirX);
-		    /*if(x+speed < grisd.w) x+=speed*forward;
-		    if(y+speed < grid.h) y+=1*forward;
-		    if(x-speed > 0) x+=speed*forward;
-		    if(y-speed < 0) y+=speed*forward;
-		    }
-		  */
-		    x+= dirX[(orient%4)] * speed * forward;
-		    y+= dirY[(orient%4)] * speed * forward;
-		    //println(x,y,orient,forward);
-		  }
-		  
-		  void move(String data){
-		    if (data=="U"){
-		      forward = 1;
-		    }else if (data=="D"){
-		      forward *= -1;
-		    }else if (data=="R"){
-		      orient--;
-		      if (orient < 0) orient = 3;
-		    }else if (data=="L"){
-		      orient++;
-		      
-		    }
-		    
-		  }
-		}
+	fill(0);
+	noStroke();
+	int currentDay = (int)(System.currentTimeMillis()/1000/60/60/24 - 3)%7;
+	text(days[currentDay] + ", " + months[month-1] + " " + day + getExt(day) + " " + year,width/2, 5*height/6);
+	text(String.format("%02d",hour())+":"+
+		String.format("%02d",minute())+":"+
+		String.format("%02d",second()), width/2, height/2 + offsetY);
+}
+
+public String getExt(int i) {
+	switch(i) {
+	case 1:
+	case 21:
+	case 31:
+		return "st";
+	case 2:
+	case 22:
+		return "nd";
+	case 3:
+	case 23:
+		return "rd";
+	default:
+		return "th";
+	}
+}
 }

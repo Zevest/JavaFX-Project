@@ -31,7 +31,9 @@ public class PreCompiler {
 	StringBuilder importation,fileContent,output;
 	String directory = "";
 	static final String srcDir = Paths.get(System.getProperty("user.dir")).toString();
-	static final String buildDir = TinyFileManager.path(srcDir,"sketch", "template");
+	static String buildDir;
+	
+	
 	static final String fileExtension = ".pjfx";
 	static String projectName = null;
 	static String dirPath = TinyFileManager.path(srcDir, "sketchBooks");
@@ -41,6 +43,13 @@ public class PreCompiler {
 	//static  final String[] flags = { "--project-path", "--project-name" };
 
 	public static void main(String[] args) {
+		if(!srcDir.endsWith("src")) {
+			buildDir = TinyFileManager.path(srcDir,"src","sketch", "template");
+		}
+		else {
+			buildDir = TinyFileManager.path(srcDir,"sketch", "template");
+		}
+		
 		if (args != null && args.length > 0) {
 			System.out.println(args[0]);
 			for (int i = 0; i < args.length; ++i) {

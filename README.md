@@ -12,8 +12,8 @@ Finally you have to change the following:
 ## How to Run sketch
 
  1. Move to project directory
- 2. `java -cp compiler.Projfx SketchFolderName`
+ 2. `java -cp ./bin compiler.Projfx SketchFolderName`
 
  To specify the directory in wich your sketch forlder is located add the absolute path from the parent directory of the sketch as second argument.
   
-* `java -cp compiler.Projfx SketchFolderName AbsolutePathToSketchParentFolder`
+* `java -cp ./bin compiler.Projfx SketchFolderName AbsolutePathToSketchParentFolder`

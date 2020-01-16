@@ -8,6 +8,16 @@ Finally you have to change the following:
 * `int(x)` -> `_int(x)`
 * `float(x)` -> `_float(x)`
 * `float g = 12.6` -> `float g = 12.6f`
+* Add public keyword to the following function
+  * __setup()__
+  * __draw()__
+  * __mousePressed()__
+  * __mouseReleased()__
+  * __mouseDragged()__
+  * __mouseMoved()__
+  * __keyPressed()__
+  * __keyReleased()__
+  * __keyTyped()__
 
 ## How to Run sketch
 

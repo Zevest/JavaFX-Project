@@ -19,6 +19,7 @@ public class PenStyle {
 	int textSizeVal;
 	SETTINGS textAligneVal;
 	SETTINGS colorModeVal;
+	SETTINGS imageModeVal;
 	
 	PenStyle(Sketch s){
 		fillColor = s.fillColor;
@@ -31,6 +32,7 @@ public class PenStyle {
 		rectModeVal = s.rectModeVal;
 		textSizeVal = s.textSizeVal;
 		colorModeVal = s.colorModeVal;
+		imageModeVal = s.imageModeVal;
 	}
 		
 

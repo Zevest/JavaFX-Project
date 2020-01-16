@@ -58,24 +58,24 @@ public class Sketch {
 	public float QUARTER_PI = (float) (Math.PI/4.0);
 	public short width = 200, height = 200,displayWidth, displayHeight;
 	private static final SETTINGS settingsVals[] = SETTINGS.values();
-	public static final int TOP = 4;
-	public static final int BOTTOM = 5;
-	public static final int CENTER = 3;
-	public static final int LEFT = 1;
-	public static final int RIGHT = 2;
-	public static final int CORNER = 6;
-	public static final int HSB = 10;
-	public static final int RGB = 9;
-	public static final int NEXT = 7;
-	public static final int BACK = 8;
-	public static final int PIE = 11;
-	public static final int CHORD = 12;
-	public static final int OPEN = 13;
-	public static final int CLOSE = 14;
-	public static final int PROJECT = 15;
-	public static final int SQUARE = 17;
-	public static final int ROUND = 16;
-	public static final int UP = 18;
+	public static final int ROUND = 1;
+	public static final int SQUARE = 2;
+	public static final int CORNER = 3;
+	public static final int NEXT = 4;
+	public static final int BACK = 5;
+	public static final int RGB = 6;
+	public static final int HSB = 7;
+	public static final int PIE = 8;
+	public static final int CHORD = 9;
+	public static final int OPEN = 10;
+	public static final int CLOSE = 11;
+	public static final int PROJECT = 12;
+	public static final int TOP = 13;
+	public static final int BOTTOM = 14;
+	public static final int CENTER = 15;
+	public static final int LEFT = 16;
+	public static final int UP = 17;
+	public static final int RIGHT = 18;
 	public static final int DOWN = 19;
 	public static final int ARROW = 1;
 	public static final int CROSS = 2;
@@ -96,13 +96,13 @@ public class Sketch {
 	boolean makingShape = false;
 
 	int textSizeVal = 15;
-	private SETTINGS textAligneValX = SETTINGS.LEFT;
-	private SETTINGS textAligneValY = SETTINGS.BOTTOM;
+	SETTINGS textAligneValX = SETTINGS.LEFT;
+	SETTINGS textAligneValY = SETTINGS.BOTTOM;
 	
 	SETTINGS colorModeVal = SETTINGS.RGB;
 	private double maxR = 255, maxG = 255, maxB = 255, maxA = 255;
 	
-	private SETTINGS imageModeVal = SETTINGS.CORNER;
+	SETTINGS imageModeVal = SETTINGS.CORNER;
 
 	private Stack<PenMatrix> matrtixStack = new Stack<PenMatrix>();
 	private Stack<PenStyle> styleStack = new Stack<PenStyle>();
@@ -124,7 +124,7 @@ public class Sketch {
 	public boolean mousePressed;
 	public boolean keyPressed;
 	public String key;
-	public KeyCode keyCode;
+	public int keyCode;
 	public final String CODED = "CODED";
 	
 	private int beizerPointVal = 20, curvePointVal = 20;
@@ -143,6 +143,28 @@ public class Sketch {
 	
 
 	static int error = 0;
+	
+	void init() {
+		cursor = ARROW;
+		ellipseModeVal = SETTINGS.CENTER;
+		rectModeVal = SETTINGS.CORNER;
+		strokeCapVal = SETTINGS.ROUND;
+		makingShape = false;
+
+		textSizeVal = 15;
+		textAligneValX = SETTINGS.LEFT;
+		textAligneValY = SETTINGS.BOTTOM;
+		
+		colorModeVal = SETTINGS.RGB;
+		maxR = 255;
+		maxG = 255;
+		maxB = 255;
+		maxA = 255;
+		imageModeVal = SETTINGS.CORNER;
+		fileLoaded = false; 
+		targetFrameRate = 60f;
+		isLoop = true;
+	}
 	
 	private final void loadPixels() {
 		if(pixels == null || pixels.length < maxWidth*height)
@@ -303,6 +325,50 @@ public class Sketch {
 		
 		try {
 			pixels[y * maxWidth + x] = col.getArgb();
+			changedPixel = true;
+		} catch(ArrayIndexOutOfBoundsException e) {
+			e.printStackTrace();
+			exit(-1);
+		}
+	}
+	
+	public final void set(int x, int y, int col) {
+		if(pixels == null || pixels.length < maxWidth*height ||  !loaded) {
+			loadPixels();
+			//System.err.println("Error: Pixel Array is empty");
+			//System.err.println("You must use the loadFastPixel function First Before trying accessing the pixel");
+			//System.exit(-1);
+			return;
+		}
+
+		if (x < minXChange)
+			minXChange = x;
+		if (y < minYChange)
+			minYChange = y;
+		
+		if (x > maxXChange)
+			maxXChange = x;
+		if (y > maxYChange)
+			maxYChange = y;
+		
+		if(minXChange >= maxXChange)
+			maxXChange = minXChange+1;
+		if(minYChange >= maxYChange)
+			maxYChange = minYChange+1;
+
+		if(y < 0 || y >= height || x < 0 || x >= width) {
+			StackTraceElement[] temp = Thread.getAllStackTraces().get(Thread.currentThread());
+			StackTraceElement e = temp[3];
+			System.err.printf("java.lang.IllegalArgumentException at function %s in (%s:%d): Coordinates (%d, %d) out of range(%d, %d)\n", temp[2].getMethodName(),e.getFileName(), e.getLineNumber(),x, y, width, height);
+			for(int i = 4; i < temp.length; ++i) {
+				System.err.println(temp[i].toString());
+			}
+			
+			exit(-1);
+		}
+		
+		try {
+			pixels[y * maxWidth + x] = col;
 			changedPixel = true;
 		} catch(ArrayIndexOutOfBoundsException e) {
 			e.printStackTrace();
@@ -808,7 +874,7 @@ public class Sketch {
 		colorModeVal = mode;
 	}
 	public final void colorMode(int mode) {
-		if(mode >= 0 && mode < settingsVals.length)
+		if(mode >= 6 && mode <= 7)
 			colorModeVal = settingsVals[mode];
 		else
 			colorModeVal = SETTINGS.RGB;
@@ -824,7 +890,7 @@ public class Sketch {
 	}
 	
 	public final void colorMode(int mode, double maxV) {
-		if(mode >= 0 && mode < settingsVals.length)
+		if(mode >= 6 && mode < 7)
 			colorMode(settingsVals[mode], maxV);
 		else
 			colorMode(SETTINGS.RGB, maxV);
@@ -897,7 +963,7 @@ public class Sketch {
 	}
 
 	public final void strokeCap(int mode) {
-		if(mode >= 15 && mode <= 17)
+		if(mode >= 0 && mode <= settingsVals.length)
 			strokeCapVal = settingsVals[mode];
 		else
 			strokeCapVal = SETTINGS.ROUND;
@@ -1252,6 +1318,7 @@ public class Sketch {
 		rectModeVal = s.rectModeVal;
 		textSizeVal = s.textSizeVal;
 		colorModeVal = s.colorModeVal;
+		imageModeVal = s.imageModeVal;
 	}
 	
 	
@@ -1302,30 +1369,29 @@ public class Sketch {
 	public final void text(Object text, double x, double y) {
 		if (isFilled)
 			switch (textAligneValY) {
-			case BOTTOM:
-				pen.fillText(text.toString(), x, y);
-				break;
+			
 			case CENTER:
 				pen.fillText(text.toString(), x, y + textSizeVal / 2);
 				break;
 			case TOP:
 				pen.fillText(text.toString(), x, y + textSizeVal);
 				break;
+			case BOTTOM:
 			default:
+				pen.fillText(text.toString(), x, y);
 				break;
 			}
 		if (isStroked)
 			switch (textAligneValY) {
-			case BOTTOM:
-				pen.strokeText(text.toString(), x, y);
-				break;
 			case CENTER:
 				pen.strokeText(text.toString(), x, y + textSizeVal / 2);
 				break;
 			case TOP:
 				pen.strokeText(text.toString(), x, y + textSizeVal);
 				break;
+			case BOTTOM:
 			default:
+				pen.strokeText(text.toString(), x, y);
 				break;
 			}
 	}

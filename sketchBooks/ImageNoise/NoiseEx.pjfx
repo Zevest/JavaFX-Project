@@ -1,0 +1,84 @@
+float space = 140, t = 0, r = 20, rspeed = 0.0025f, divisor = 8;
+int s = 5, count = 0;
+boolean mode = true;
+PImage bg;
+public void setup(){
+    size(480, 360);
+    background(0);
+    textSize(20);
+    bg = loadImage("Desert.jpg");
+}
+
+public void draw(){
+  t+= rspeed;
+  //displayNoise(false);
+  displayImg(mode);
+  if(s > 5 && frameCount % 3 == 0){
+    s--;
+  }
+  if(t >= TWO_PI){
+    exit();
+  }
+  count++;
+}
+
+
+float getR(int x, int y, boolean notClamped){
+  int c = _int(noise(x/space + cos(t) * r,y/space+ sin(t) * r, sin(t) * r/2) *  255);
+  //int c = int(noise(x/space,y/space, sin(t) * r/2) *  255);
+  //int c = int(noise(x/space + cos(t) * r,y/space+ sin(t) * r) *  255);
+  if(notClamped){
+    return c;
+  }
+  int r;
+  if(c < 65-s ){
+    r = 0;
+  }
+  else if(c < 125-s){
+    r = 65;
+  } else if(c < 185-s){
+    r = 125;
+  }else if(c < 185+s){
+    r = 185;
+  }else{
+    r = 255;
+  }
+  return r;
+}
+void displayImg(boolean does){
+
+  bg.loadPixels();
+  float yStep = _float(bg.height)/_float(height);
+  float xStep = _float(bg.width)/_float(width);
+  for(int j = 0; j < height; j++){
+    for(int i = 0; i < width; i++){ 
+      float e = (0.5f - getR(i,j, does))/divisor;
+      float y = _int(j * bg.width);
+      float x = _int(i + e);
+      x = constrain(x,0,bg.width);
+      //y = y<0 ? 0: y;
+      //println(xStep, yStep);
+      set(_int(i), _int(j),bg.pixels[_int(x*xStep) + _int(y)]);
+
+    }
+  }
+
+}
+
+void displayNoise(boolean does){
+
+  for(int y = 0; y < _int(height/2); y++){
+    for(int x = 0; x < _int(width/2); x++){
+      set(x,y,color(getR(x,y, does)));
+      //println(pixels[(y * width) + x]);
+    }
+  }
+
+}
+
+
+public void keyPressed(){
+  if(s < 60){
+    s += 2;
+  }
+}

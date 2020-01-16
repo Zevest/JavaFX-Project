@@ -15,7 +15,7 @@
 	public void setup(){
 	  fullScreen();
 	  //frameRate(10);
-		//size(500, 500);
+	//size(500, 500);
 	  //frameRate(10);
 	  particles = new ArrayList<Particle>();
 	  color[] col = {color(255,0,0), color(0,0,255), color(0,255,0), color(255,255,0), color(255,255,255),
@@ -149,7 +149,7 @@
 	
 	public void keyPressed(){
 	  if (key == CODED) {
-		  if (keyCode == KeyCode.ESCAPE) {
+		  if (keyCode == 10) {
 			  exit();
 		  }
 	  }

@@ -93,6 +93,7 @@ public class Core extends Application {
 		
     	if(sketch.isLoop || redraw) {
     		sketch.pushMatrix();
+    		sketch.pushStyle();
     		sketch.draw();
     		if(sketch.getChangedPixel()) {
     			sketch.updatePixels();
@@ -100,6 +101,7 @@ public class Core extends Application {
     		}else if(sketch.getLoaded()) {
     			sketch.resetPixelsFlags();
     		}
+    		sketch.pushStyle();
     		sketch.popMatrix();
     		redraw = false;
     	}
@@ -262,8 +264,8 @@ public class Core extends Application {
 				//get The keyPressed
 
 				String tmp = event.getText();
-				sketch.key = tmp.length() > 0 ? tmp : "CODED";
-				sketch.keyCode = event.getCode();
+				sketch.key = (tmp.length() > 0 && tmp != "?") ? tmp : "CODED";
+				sketch.keyCode = event.getCode().ordinal();
 				 sketch.keyPressed = true;
 				sketch.keyPressed();
 				//sketch.keyPressed(event);
@@ -279,7 +281,7 @@ public class Core extends Application {
 			public void handle(KeyEvent event) {
 				String tmp = event.getText();
 				sketch.key = tmp.length() > 0 ? tmp : "CODED";
-				sketch.keyCode = event.getCode();
+				sketch.keyCode = event.getCode().ordinal();
 				sketch.keyPressed = false;
 				sketch.keyReleased();
 				//sketch.keyReleased(event);
@@ -295,7 +297,7 @@ public class Core extends Application {
 			public void handle(KeyEvent event) {
 				String tmp = event.getText();
 				sketch.key = tmp.length() > 0 ? tmp : "CODED";
-				sketch.keyCode = event.getCode();
+				sketch.keyCode = event.getCode().ordinal();
 				sketch.keyTyped();
 				//sketch.keyTyped(event);
 				//set KeyPressed to 0
@@ -330,6 +332,7 @@ public class Core extends Application {
     	sketch.displayWidth = (short) bound.getWidth();
     	sketch.displayHeight = (short) bound.getHeight();
     	mainStage.setTitle(Core.projectName);
+    	sketch.init();
     	sketch.setup();
     	mainStage.sizeToScene();
     	//mainStage.setHeight(sketch.height+35);

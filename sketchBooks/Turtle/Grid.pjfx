@@ -1,0 +1,52 @@
+class Grid{
+		  String[] world;
+		  int w, h;
+		  float lw;
+		  float lh;
+		  
+		  Grid(int w, int h){
+		    this.w = w;
+		    this.h = h;
+		    lw = width/this.w;
+		    lh = height/this.h;
+		    world = new String[this.w * this.h];
+		  }
+		  
+		  
+		  void display(){
+		    float lw = width/w;
+		    float lh = height/h;
+		    textAlign(CENTER);
+		    textSize(20);
+		    //rectMode(CORNER);
+		    for(int i = 0; i < w*h; i++){
+		      int[] pos = coord(i);
+		      fill(255);
+		      rect(pos[0] * lw, pos[1] * lh, lw, lh); 
+		      if(world[i] != "" && world[i] != null){
+		        fill(0);
+		        text(world[i], pos[0] * lw + lw/2, pos[1]*lh+lh/1.5);
+		      }
+		    }
+		  }
+		  
+		  void set(int x, int y, String val){
+		    println(""+val+" Added to ("+x+","+y+")");
+		    world[index(x,y)] = val;
+		    println(world[index(x,y)] = val);
+		  }
+		  
+		  String get(int x, int y){
+			 // println("getting",world[index(x,y)]);
+		    return world[index(x,y)];
+		  }
+		  
+		  int[] coord(int index){
+		    int[] temp = {index % w, (int) index/h};
+		    return temp;
+		  }
+		  
+		  int index(int x, int y){
+		    return y * w + x;
+		  }
+		}

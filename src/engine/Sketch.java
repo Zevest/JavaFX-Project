@@ -1405,8 +1405,8 @@ public class Sketch {
 	}
 	
 	public final void textAlign(int modeX, int modeY) {
-		if(modeX >= 1 && modeX <= 3) {
-			if(modeY >= 3 && modeY <=5)
+		if(modeX >= 0 && modeX < settingsVals.length) {
+			if(modeY >= 3 && modeY < settingsVals.length)
 				textAlign(settingsVals[modeX], settingsVals[modeY]);
 		}else {
 			textAlign(settingsVals[LEFT], settingsVals[BOTTOM]);

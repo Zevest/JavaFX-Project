@@ -18,8 +18,8 @@ public enum SETTINGS {
 	BOTTOM(14),
 	CENTER(15),
 	LEFT(16),
-	RIGHT(18),
 	UP(17),
+	RIGHT(18),
 	DOWN(19);
 	
 	

@@ -46,7 +46,8 @@ javac -cp "bin/:libs/com/json.jar:libs/linux/javafx/lib" --module-path libs/linu
 
 1.
 * __For a project called MySketch inside the default sketchBook directory.__
-  * _MySketch is the Name of the directory where all your .pjfx files for are._
+  * _The sketchBook is the parent directory of your sketch folder._
+  * _MySketch is the Name of the directory where all your .pjfx files for a project are stored._
   
   _(windows)_
 ```powershell
@@ -57,8 +58,7 @@ java -cp ".\bin\;libs\com\json.jar:libs\window\javafx\lib" --module-path .\libs\
 java -cp "bin/:libs/com/json.jar:libs/linux/javafx/lib" --module-path libs/linux/javafx/lib --add-modules javafx.controls, precompiler.PreCompiler --project-name MySketch
 ```
 * __For a project called MySketch not in the default sketchBook directory.__
-  * _A sketchBook is the parent directory of your sketch folder._
-  
+
   _(windows)_
 ```powershell
 java -cp ".\bin\;libs\com\json.jar:libs\window\javafx\lib" --module-path .\libs\window\javafx\lib --add-modules javafx.controls, precompiler.PreCompiler --project-name MySketch -- project-path \path\to\the\other\sketchBook
@@ -68,7 +68,7 @@ java -cp ".\bin\;libs\com\json.jar:libs\window\javafx\lib" --module-path .\libs\
 java -cp "bin/:libs/com/json.jar:libs/linux/javafx/lib" --module-path libs/linux/javafx/lib --add-modules javafx.controls, precompiler.PreCompiler --project-name MySketch -- project-path /path/to/the/other/sketchBook
 ```
 2.
-* __Compile your Sketch with__
+* __Compile your project with__
 
  _(windows)_
 ```powershell
@@ -79,7 +79,7 @@ javac -cp ".\bin\;libs\com\json.jar:libs\window\javafx\lib" --module-path .\libs
 javac -cp "bin/:libs/com/json.jar:libs/linux/javafx/lib" --module-path libs/linux/javafx/lib -d bin --add-modules javafx.controls, src/sketch/template/__UserDefault.java
 ```
 3.
-* __Run your Sketch with__
+* __Run your project with__
 
  _(windows)_
 ```powershell
@@ -92,7 +92,7 @@ java -cp "bin/:libs/com/json.jar:libs/linux/javafx/lib" --module-path libs/linux
 
 
 
-## Auto Compile/Run your sketch _**(windows only)**_
+## Auto Compile/Run your project _**(windows only)**_
 
  1. Move to project directory
  2. `java -cp .\bin compiler.Projfx SketchFolderName` 

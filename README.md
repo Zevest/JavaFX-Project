@@ -61,11 +61,11 @@ java -cp "bin/:libs/com/json.jar:libs/linux/javafx/lib" --module-path libs/linux
 
   _(windows)_
 ```powershell
-java -cp ".\bin\;libs\com\json.jar:libs\window\javafx\lib" --module-path .\libs\window\javafx\lib --add-modules javafx.controls, precompiler.PreCompiler --project-name MySketch -- project-path \path\to\the\other\sketchBook
+java -cp ".\bin\;libs\com\json.jar:libs\window\javafx\lib" --module-path .\libs\window\javafx\lib --add-modules javafx.controls, precompiler.PreCompiler --project-name MySketch --project-path \path\to\the\other\sketchBook
 ```
   _(linux)_
 ```bash
-java -cp "bin/:libs/com/json.jar:libs/linux/javafx/lib" --module-path libs/linux/javafx/lib --add-modules javafx.controls, precompiler.PreCompiler --project-name MySketch -- project-path /path/to/the/other/sketchBook
+java -cp "bin/:libs/com/json.jar:libs/linux/javafx/lib" --module-path libs/linux/javafx/lib --add-modules javafx.controls, precompiler.PreCompiler --project-name MySketch --project-path /path/to/the/other/sketchBook
 ```
 2.
 * __Compile your project with__
